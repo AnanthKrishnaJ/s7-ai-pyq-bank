@@ -282,6 +282,8 @@ body.print .mcover .cv-s{font-size:12.5px}
 body.print .mcover .mmeta{font-size:10.5px}
 body.print .sheet{padding:0;font-size:12px}
 body.print .prow{padding:4px 0}
+body.print.allmods .mod{break-before:auto;margin-top:14px}
+.sechb{display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){.isl,.live i::after{animation:none}.scard,.mitem,.pill{transition:none}}
 
 /* drawn figures */
@@ -384,7 +386,7 @@ body.print .prow{padding:4px 0}
     <div class="strip" id="strip"></div>
     <div class="sech"><h2>Pick the subject you are preparing</h2><span class="pill sm dark" id="pickn" style="cursor:default"></span></div>
     <div class="cards" id="picker"></div>
-    <div class="sech"><h2 id="modh">Modules</h2><button class="pill sm dark" id="toRep" type="button">Repeats table</button></div>
+    <div class="sech"><h2 id="modh">Modules</h2><div class="sechb"><button class="pill sm" id="allA" type="button" hidden><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>All modules · 3 marks PDF</button><button class="pill sm dark" id="toRep" type="button">Repeats table</button></div></div>
     <div class="mgrid" id="mgrid"></div>
     <div class="sech studyh"><h2 id="studyh">Questions and answers</h2></div>
   </div>

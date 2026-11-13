@@ -28,7 +28,8 @@ SUBJ.AIT401={code:'AIT401',name:'Foundations of Deep Learning',short:'Deep learn
  books:'Answers follow the KTU AIT401 syllabus texts (Goodfellow et al., <i>Deep Learning</i>; Aggarwal, <i>Neural Networks and Deep Learning</i>).',
  PAPERS:AIT_PAPERS,MODS:AIT_MODS,QB:AIT_QB,pdf:'ait401-pyq-answers.pdf'};
 """ + ''.join(f"SUBJ.{c}.pdf='{p}';\n" for c, p in pdfs.items()) + ''.join(
-    f"SUBJ.{c}.modPdf=true;\n" for c in ('AIT401', 'CST423', 'EET435', 'MCN401') if os.path.exists(os.path.join(root, 'out', 'mod', f'{c.lower()}-m5-part-b.pdf')))
+    f"SUBJ.{c}.modPdf=true;\n" for c in ('AIT401', 'CST423', 'EET435', 'MCN401') if os.path.exists(os.path.join(root, 'out', 'mod', f'{c.lower()}-m5-part-b.pdf'))) + ''.join(
+    f"SUBJ.{c}.allA=true;\n" for c in ('AIT401', 'CST423', 'EET435', 'MCN401') if os.path.exists(os.path.join(root, 'out', 'mod', f'{c.lower()}-all-part-a.pdf')))
 shell = open(os.path.join(root, 'src', 'shell.html'), encoding='utf8').read()
 app = '\n'.join(open(os.path.join(root, 'src', f), encoding='utf8').read() for f in ('fig2.js', 'figmap.js', 'app.js'))
 def page(pre=''):
@@ -44,6 +45,8 @@ for c in ('AIT401', 'CST423', 'EET435', 'MCN401'):
         for p in 'AB':
             open(os.path.join(out, 'mod', f'print-{c.lower()}-m{m}-part-{p.lower()}.html'), 'w', encoding='utf8').write(
                 skel + page(f"<script>window.PRINT_MODE=1;window.PRINT_SUBJ='{c}';window.PRINT_MOD={m};window.PRINT_PART='{p}'</script>\n") + '</body></html>')
+    open(os.path.join(out, 'mod', f'print-{c.lower()}-all-part-a.html'), 'w', encoding='utf8').write(
+        skel + page(f"<script>window.PRINT_MODE=1;window.PRINT_SUBJ='{c}';window.PRINT_MOD='all';window.PRINT_PART='A'</script>\n") + '</body></html>')
 open(os.path.join(out, 'preview.html'), 'w', encoding='utf8').write(skel + page() + '</body></html>')
 # standalone site (Vercel / any static host): proper head, PDFs served from pdf/
 site_head = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
