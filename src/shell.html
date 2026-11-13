@@ -45,6 +45,8 @@ body{background:var(--bg)}
 .pill:hover{background:var(--surface2)}.pill:active{transform:scale(.97)}
 .pill.dark{background:var(--ink);color:#fff}.pill.dark:hover{background:#2a2f38}
 .pill.sm{padding:6px 13px;font-size:12.5px}
+.pill.apk{text-decoration:none}.pill.apk svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.pill.apk small{font:600 10px/1 var(--mono);letter-spacing:.04em;color:var(--muted);border:1px solid var(--line2);border-radius:5px;padding:2px 4px}.pill.apk:hover small{color:var(--ink)}
+.android-app .pill.apk{display:none}
 .chips{display:flex;align-items:center;gap:22px;margin-top:44px;flex-wrap:wrap}
 .disc{display:flex;align-items:center;gap:12px;background:var(--accent-soft);border:0;border-radius:6px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--ink);font:500 12.5px/1.35 var(--f);transition:background .2s}
 .disc:hover{background:#dcebf8}
@@ -333,7 +335,7 @@ body.print.allmods .mod{break-before:auto;margin-top:14px}
     <div>
       <h1><span class="ln">Previous Year</span><span class="ln">Questions, Answered</span></h1>
       <p class="lede">Every KTU university exam question for your <b>S7 B.Tech AI</b> courses, sorted module by module, tracked for repeats, and answered to its marks.</p>
-      <div class="cta"><button class="pill dark" id="ctaMod" type="button">Start Module I</button><button class="pill" id="ctaPap" type="button">Latest paper</button></div>
+      <div class="cta"><button class="pill dark" id="ctaMod" type="button">Start Module I</button><button class="pill" id="ctaPap" type="button">Latest paper</button><a class="pill apk" id="ctaApk" href="app/PYQ-Bank.apk" download="PYQ-Bank.apk" title="Android app (APK, about 46 MB): works offline, all PDFs included"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 9.5h9.6v7.1a1.4 1.4 0 0 1-1.4 1.4H8.6a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M7.4 8.3a4.6 4.6 0 0 1 9.2 0zM9 4.2l1 1.6M15 4.2l-1 1.6M5 10v4.6M19 10v4.6M10 18v2.3M14 18v2.3"/></svg>Android app<small>APK</small></a></div>
       <div class="chips"><button class="disc" id="disc" type="button"><span class="th"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1115" stroke-width="1.6"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><span id="disct">Open the newest<br>question paper</span><span class="go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></button>
         <span class="live"><i></i>Updated to<br><span id="newest">May 2026</span></span></div>
     </div>

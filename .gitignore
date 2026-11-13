@@ -2,3 +2,6 @@ out/
 _check.js
 *.png
 .vercel
+*.p12
+*.jks
+*.keystore

@@ -1,0 +1,17 @@
+<script>
+/* Android app bridge: PDFs open from the copies bundled in the app; Back walks the in-app view history. */
+(function(){
+ if(!window.AndroidApp)return;
+ document.documentElement.classList.add('android-app');
+ window.saveFile=function(path,filename,btn){try{AndroidApp.pdf(String(path),String(filename||path))}catch(e){if(typeof toast==='function')toast('Could not open the PDF')}};
+ var st=[],cur=location.hash,lock=false,rs=history.replaceState.bind(history);
+ function push(h){if(lock||h===cur)return;if(cur&&cur!=='#')st.push(cur);if(st.length>80)st.shift();cur=h}
+ history.replaceState=function(s,t,u){if(typeof u==='string'&&u.charAt(0)==='#')push(u);return rs(s,t,u)};
+ addEventListener('hashchange',function(){push(location.hash)});
+ window.__appBack=function(){
+  var open=document.querySelector('dialog[open]');if(open){try{open.close()}catch(e){}return true}
+  if(!st.length)return false;var h=st.pop();lock=true;cur=h;rs(null,'',h);
+  try{dispatchEvent(new HashChangeEvent('hashchange'))}finally{lock=false}return true};
+ window.__appToast=function(m){if(typeof toast==='function')toast(m)};
+})();
+</script>

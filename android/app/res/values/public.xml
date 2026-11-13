@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources package="com.ananth.pyqbank" id="0x7f">
+  <public id="0x7f010000" type="mipmap" name="ic_launcher" />
+  <public id="0x7f010001" type="mipmap" name="ic_launcher_fg" />
+  <public id="0x7f010002" type="mipmap" name="ic_launcher_mono" />
+  <public id="0x7f020000" type="color" name="ic_launcher_bg" />
+  <public id="0x7f020001" type="color" name="page_bg" />
+  <public id="0x7f030000" type="string" name="app_name" />
+  <public id="0x7f040000" type="style" name="AppTheme" />
+</resources>
