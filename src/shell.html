@@ -47,6 +47,8 @@ body{background:var(--bg)}
 .pill.sm{padding:6px 13px;font-size:12.5px}
 .pill.apk{text-decoration:none}.pill.apk svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.pill.apk small{font:600 10px/1 var(--mono);letter-spacing:.04em;color:var(--muted);border:1px solid var(--line2);border-radius:5px;padding:2px 4px}.pill.apk:hover small{color:var(--ink)}
 .android-app .pill.apk{display:none}
+/* phones and short screens: the filter bar scrolls away with the page instead of pinning under the header */
+@media (max-width:700px),(max-height:560px){.tool{position:static;z-index:auto;background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
 .chips{display:flex;align-items:center;gap:22px;margin-top:44px;flex-wrap:wrap}
 .disc{display:flex;align-items:center;gap:12px;background:var(--accent-soft);border:0;border-radius:6px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--ink);font:500 12.5px/1.35 var(--f);transition:background .2s}
 .disc:hover{background:#dcebf8}
