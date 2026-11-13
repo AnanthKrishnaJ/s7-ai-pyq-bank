@@ -470,6 +470,50 @@ body.print .credit{display:none}
 @media (max-width:1100px){.nextx{display:none}}
 @media (prefers-reduced-motion:reduce){.exc,.cd .u b.t,.exc.next .top1 em,.nextx i{animation:none}}
 body.print .exams{display:none}
+/* ---------- compact A4 print: fill pages, no half-empty sheets ---------- */
+@page{size:A4;margin:9mm 9mm 10mm}
+body.print{font-size:11.5px;line-height:1.42}
+body.print .row,body.print .yb,body.print .mod,body.print .mhead,body.print .ans,body.print .answ,body.print .ansin,body.print .body{display:block;overflow:visible}
+body.print .row{padding:7px 10px 7px 12px;margin:5px 0;border-radius:6px;break-inside:auto}
+body.print .row>*+*,body.print .ans>*+*,body.print .mhead>*+*{margin-top:5px}
+body.print .row::before{height:16px;top:9px}
+body.print .qt{font-size:12.5px;line-height:1.38}
+body.print .qn,body.print .mkb{padding:4px 5px;font-size:11px}
+body.print .meta{gap:4px;font-size:10.5px}
+body.print .rep,body.print .yr{padding:3px 6px;font-size:10px}
+body.print .body{padding:7px 9px;margin-top:3px;font-size:11.5px;border-radius:6px}
+body.print .body p{margin:.3em 0}
+body.print .body ul,body.print .body ol{margin:.25em 0;padding-left:17px}
+body.print .body li{margin:.12em 0}
+body.print .body h4{margin:.6em 0 .2em;font-size:10.5px}
+body.print .split{padding-bottom:4px;margin-bottom:4px;gap:4px}
+body.print .chipm{font-size:10.5px;padding:2px 2px 2px 6px}
+body.print .eqb{padding:5px 8px;margin:.35em 0;font-size:10.5px;line-height:1.45}
+body.print .tw{margin:.35em 0}
+body.print table.t{font-size:10.5px}
+body.print table.t th,body.print table.t td{padding:3px 6px}
+body.print .fig{margin:.35em 0;padding:5px 6px 4px;break-inside:avoid}
+body.print .fig svg{max-width:min(100%,140mm);max-height:58mm;height:auto}
+body.print .fig.sm svg{max-width:min(100%,95mm)}
+body.print .fig figcaption{margin-top:2px;font-size:10px}
+body.print .yb{padding:4px 0 0}
+body.print .ybh{padding-bottom:3px;margin-bottom:3px}
+body.print .yy{font-size:13px}
+body.print .parth{margin-top:8px;font-size:11.5px}
+body.print .or{margin:1px 0;font-size:10px}
+body.print .mhead{padding-bottom:6px}
+body.print .mhead h2{font-size:20px}
+body.print .syl{font-size:10.5px;margin-top:2px}
+body.print .hot{gap:4px}
+body.print .hotc{font-size:10.5px;padding:2px 3px 2px 8px}
+body.print .same{padding:4px 8px;font-size:11px}
+body.print .topic{margin-top:4px}
+body.print .mcover{gap:3px;padding-bottom:6px;margin-bottom:4px}
+body.print .mcover h1{font-size:22px}
+body.print .mcover .cv-s{font-size:12.5px}
+body.print .mcover .mmeta{font-size:10.5px}
+body.print .sheet{padding:0;font-size:12px}
+body.print .prow{padding:4px 0}
 @media (prefers-reduced-motion:reduce){.isl,.live i::after{animation:none}.scard,.mitem,.pill{transition:none}}
 
 /* drawn figures */
