@@ -135,6 +135,28 @@ function figures(){const n=SUB._n,P0=PAPERS.find(p=>!p.model);
   $('#subsel').value=S.sub;modGrid();if($('#figures').classList.contains('in'))countUp()}
 function countUp(){if(RM)return;document.querySelectorAll('#figures .fig1 b').forEach(b=>{const v=+b.dataset.v;if(!v)return;const t0=performance.now();
   const f=t=>{const k=Math.min(1,(t-t0)/1100),e=1-Math.pow(1-k,3);b.textContent=Math.round(v*e);if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
+/* -------- exam countdown (KTU forenoon session, 09:30 IST) -------- */
+const EXAMS=[['AIT401','2026-11-23'],['CST423','2026-11-25'],['EET435','2026-11-27'],['MCN401','2026-12-02']].filter(([c])=>SUBJ[c]).map(([c,d])=>({c,t:new Date(d+'T09:30:00+05:30').getTime()}));
+const EXAM_LEN=3*3600e3,WINDOW=30*864e5;
+function examsInit(){const el=$('#exams');if(!el||!EXAMS.length)return;
+  const fmt=t=>new Date(t).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
+  el.innerHTML=`<div class="exh"><h2>Exam countdown</h2><p>KTU S7 university exams · forenoon session, 09:30 AM IST</p></div><div class="exgrid">`+
+   EXAMS.map((e,i)=>`<button type="button" class="exc" data-sub="${e.c}" style="--sc:${SCOL[e.c]};--d:${i*.08}s"><span class="top1"><i></i>${e.c}<em></em></span><b class="nm2">${SUBJ[e.c].name}</b><span class="when">${fmt(e.t)}</span>
+     <span class="cd">${['days','hrs','min','sec'].map(u=>`<span class="u"><b data-u="${u}">–</b><span>${u}</span></span>`).join('')}</span><span class="msg" hidden></span><span class="bar"><i></i></span></button>`).join('')+`</div>`;
+  el.addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(b)setSub(b.dataset.sub,true)});
+  $('#nextx').addEventListener('click',()=>{const n=EXAMS.find(e=>e.t+EXAM_LEN>Date.now());if(n)setSub(n.c,true)});
+  examTick();setInterval(examTick,1000)}
+function examTick(){const now=Date.now(),cards=document.querySelectorAll('#exams .exc');const next=EXAMS.findIndex(e=>e.t+EXAM_LEN>now);
+  EXAMS.forEach((e,i)=>{const card=cards[i];if(!card)return;const d=e.t-now,live=d<=0&&d>-EXAM_LEN,done=d<=-EXAM_LEN;
+    card.classList.toggle('next',i===next);card.classList.toggle('done',done);
+    card.querySelector('em').textContent=done?'done':live?'in progress':i===next?'next exam':`exam ${i+1}`;
+    const msg=card.querySelector('.msg');msg.hidden=!(live||done);msg.textContent=live?'Exam in progress. All the best!':done?'Exam over':'';
+    card.querySelector('.cd').hidden=live||done;
+    if(d>0){const s=Math.floor(d/1e3),v={days:Math.floor(s/86400),hrs:Math.floor(s%86400/3600),min:Math.floor(s%3600/60),sec:s%60};
+      card.querySelectorAll('[data-u]').forEach(b=>{const t=String(v[b.dataset.u]).padStart(b.dataset.u==='days'?1:2,'0');if(b.textContent!==t){b.textContent=t;if(!RM){b.classList.remove('t');void b.offsetWidth;b.classList.add('t')}}})}
+    card.querySelector('.bar i').style.setProperty('--p',Math.max(0,Math.min(100,100*(1-d/WINDOW)))+'%')});
+  const nx=$('#nextx');if(next<0){nx.hidden=true;return}const e=EXAMS[next],d=e.t-now;nx.hidden=false;
+  nx.querySelector('span').textContent=d<=0?`${e.c} exam in progress`:`${e.c} in ${Math.floor(d/864e5)}d ${Math.floor(d%864e5/36e5)}h ${Math.floor(d%36e5/6e4)}m`}
 function setupMotion(){
   if(RM)document.querySelectorAll('.smil').forEach(a=>a.remove());
   document.querySelectorAll('.statement,.figures,.strip,.sech,.cards,.mgrid').forEach(e=>e.classList.add('rv'));
@@ -262,6 +284,6 @@ function printDoc(){const ex=PAPERS.filter(p=>!p.model),model=PAPERS.some(p=>p.m
 
 /* -------- boot -------- */
 if(PRINT){load(window.PRINT_SUBJ||'AIT401');document.body.classList.add('print');$('#app').innerHTML=printDoc();$('#app').querySelectorAll('button').forEach(b=>{b.outerHTML=`<span class="${b.className}">${b.innerHTML}</span>`})}
-else{fromHash();picker();figures();measure();bind();render(false);setupMotion();
+else{fromHash();picker();figures();measure();bind();render(false);setupMotion();examsInit();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure();moveInd('#views','button');moveInd('#seg','button')});
   try{window.claude&&window.claude.use&&window.claude.use('downloads').then(d=>{DL=d}).catch(()=>{})}catch(e){}}

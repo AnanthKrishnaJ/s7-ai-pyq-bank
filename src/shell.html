@@ -201,6 +201,43 @@ body.print .rv{transform:none;opacity:1}
 .credit:hover .nm{animation-duration:1.6s}
 @media (prefers-reduced-motion:reduce){.nm,.ul path,.spark{animation:none}}
 body.print .credit{display:none}
+/* exam countdown */
+.exams{padding-block:36px 6px;scroll-margin-top:calc(var(--hh) + 10px)}
+.exh{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.exh h2{font:500 clamp(24px,3.2vw,34px)/1.1 var(--disp);letter-spacing:-.025em}
+.exh p{margin:0;font-size:12.5px;color:var(--muted)}
+.exgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:980px){.exgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.exgrid{grid-template-columns:minmax(0,1fr)}}
+.exc{position:relative;display:grid;gap:12px;text-align:left;border:1px solid var(--line2);border-radius:12px;padding:16px 16px 14px;background:var(--bg);color:var(--ink);cursor:pointer;overflow:hidden;font:inherit;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .2s;animation:rise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0s)}
+.exc:hover{transform:translateY(-4px);box-shadow:0 14px 30px -20px rgba(15,17,21,.45);border-color:var(--ink2)}
+.exc .top1{display:flex;align-items:center;gap:8px;font:600 11.5px var(--mono);color:var(--muted)}
+.exc .top1 i{width:9px;height:9px;border-radius:50%;background:var(--sc)}
+.exc .top1 em{margin-left:auto;font:600 10.5px var(--f);font-style:normal;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface2);color:var(--ink2)}
+.exc b.nm2{font:500 17px/1.25 var(--disp);letter-spacing:-.01em}
+.exc .when{font-size:12.5px;color:var(--muted)}
+.cd{display:flex;gap:6px;align-items:flex-start}
+.cd .u{display:grid;justify-items:center;gap:2px;min-width:0;flex:1;padding:8px 2px;border-radius:8px;background:var(--surface)}
+.cd .u b{display:block;font:500 clamp(22px,2.6vw,30px)/1 var(--disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em;overflow:hidden}
+.cd .u span{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cd .u b.t{animation:tk .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes tk{from{transform:translateY(-55%);opacity:.2}to{transform:none;opacity:1}}
+.bar{height:4px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;width:var(--p,0%);background:var(--sc);border-radius:99px;transition:width 1s linear}
+.exc.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.exc.next .top1,.exc.next .when,.exc.next .cd .u span{color:#c9ced8}
+.exc.next .top1 em{background:var(--sc);color:#fff;animation:blink 1.6s ease-in-out infinite}
+.exc.next .cd .u{background:rgba(255,255,255,.08)}
+.exc.next .bar{background:rgba(255,255,255,.14)}
+.exc.done{opacity:.6}
+.exc.done .cd{display:none}
+.exc .msg{font:500 15px var(--disp);color:inherit}
+.nextx{display:inline-flex;align-items:center;gap:7px;border:0;background:var(--accent-soft);color:var(--ink);font:500 12.5px var(--f);padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.nextx i{width:7px;height:7px;border-radius:50%;background:var(--s-mcn);animation:blink 1.4s ease-in-out infinite}
+.nextx span{font-variant-numeric:tabular-nums}
+@media (max-width:1100px){.nextx{display:none}}
+@media (prefers-reduced-motion:reduce){.exc,.cd .u b.t,.exc.next .top1 em,.nextx i{animation:none}}
+body.print .exams{display:none}
 @media (prefers-reduced-motion:reduce){.isl,.live i::after{animation:none}.scard,.mitem,.pill{transition:none}}
 
 /* drawn figures */
@@ -240,6 +277,7 @@ body.print .credit{display:none}
     <button type="button" data-v="tab"><svg viewBox="0 0 24 24"></svg>Repeats</button>
   </div>
   <div class="hdr-r">
+    <button class="nextx" id="nextx" type="button" hidden><i></i><span></span></button>
     <label class="subsel" for="subsel"><select id="subsel" aria-label="Subject"></select><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></label>
     <button class="dl" id="dl" type="button"><span class="dlt">Download PDF</span><span class="dls">PDF</span></button>
   </div>
@@ -295,6 +333,7 @@ body.print .credit{display:none}
       <g filter="url(#blur2)" fill="#ffffff"><ellipse cx="150" cy="410" rx="90" ry="26"/><ellipse cx="300" cy="430" rx="130" ry="28"/><ellipse cx="430" cy="404" rx="90" ry="24"/></g>
     </svg></div>
   </section>
+  <section class="exams" id="exams" aria-label="Exam countdown"></section>
   <div class="home">
     <p class="statement" id="statement"></p>
     <section class="figures" id="figures"></section>
