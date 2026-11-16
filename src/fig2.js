@@ -62,15 +62,15 @@ function ivMpp(){const isc=8,voc=0.62,f=v=>isc*(1-Math.exp((v-voc)/0.03)),X=v=>6
   s+=Ln([[X(bv),Y(f(bv))],[X(bv),Y(0)]],{d:'4 3'})+Ln([[X(0),Y(f(bv))],[X(bv),Y(f(bv))]],{d:'4 3'});
   s+=C(X(bv),Y(f(bv)),4.5,'dot c1s')+C(X(bv),Yp(bp),4,'dot c3s');
   s+=T(X(0)-8,Y(isc)-7,'Isc',{a:'end',fs:11})+T(X(0)-8,Y(f(bv))+7,'Imp',{a:'end',fs:11})+T(X(voc)+8,Y(0)+12,'Voc',{fs:11})+T(X(bv)-6,Y(0)+12,'Vmp',{fs:11});
-  s+=T(X(bv)+10,Y(f(bv))-12,'MPP (Vmp, Imp)',{a:'start',fs:11,fw:600})+T(X(bv)+10,Yp(bp)-10,'Pmax',{a:'start',fs:11,c:'s'});
+  s+=T(X(bv)+10,Y(f(bv))-12,'MPP (Vmp, Imp)',{a:'start',fs:11,fw:600})+T(X(bv)+10,Yp(bp)-22,'Pmax',{a:'start',fs:11,c:'s'});
   s+=T(X(bv)/2+X(0)/2,Y(f(bv)/2),'Vmp·Imp',{fs:11,c:'s'})+T(440,70,'I–V',{a:'start',fs:11,c:'s'})+T(440,90,'P–V',{a:'start',fs:11,c:'s'});
   s+=Ln([[425,70],[436,70]],{c:'l c1s'})+Ln([[425,90],[436,90]],{c:'l c3s'})+T(240,256,'FF = (Vmp·Imp)/(Voc·Isc) = shaded area / (Voc·Isc rectangle)',{fs:11,c:'s'});
   return wrap(500,268,s,'I–V and P–V curves with maximum power point and fill factor')}
-function powerCurve(){const X=v=>50+v/28*400,Y=p=>190-p*150;let s=axes(50,30,410,160,'Wind speed (m/s)','Power');
+function powerCurve(){const X=v=>50+v/28*400,Y=p=>190-p*150;let s=axes(50,30,410,160,'','Power')+T(250,236,'Wind speed (m/s)',{fs:11,c:'s'});
   s+=P(`M${X(0)} ${Y(0)} L${X(3.5)} ${Y(0)} `+Array.from({length:21},(_,i)=>{const v=3.5+i*(12-3.5)/20,p=Math.pow((v-3.5)/8.5,2.4);return `L${r1(X(v))} ${r1(Y(Math.min(p,1)))}`}).join(' ')+` L${X(25)} ${Y(1)} L${X(25)} ${Y(0)} L${X(28)} ${Y(0)}`,'l c1s thick');
   [[3.5,'Vci\ncut-in'],[12,'Vr\nrated'],[25,'Vco\ncut-out']].forEach(([v,t])=>{s+=Ln([[X(v),Y(0)],[X(v),Y(1.08)]],{d:'4 3'})+T(X(v),Y(0)+20,t,{fs:10.5,c:'s'})});
-  s+=T(X(1.75),Y(0.35),'I\nno output',{fs:10.5,c:'s'})+T(X(7.6),Y(0.72),'II\nP ∝ V³',{fs:10.5})+T(X(18.5),Y(0.82),'III  rated power\n(pitch / stall)',{fs:10.5})+T(X(26.5),Y(0.4),'IV\nshut\ndown',{fs:10.5,c:'s'})+T(X(0)-6,Y(1),'Pr',{a:'end',fs:11});
-  return wrap(480,232,s,'Power curve of a wind turbine')}
+  s+=T(X(1.75),Y(0.35),'I\nno\noutput',{fs:10.5,c:'s'})+T(X(7.6),Y(0.72),'II\nP ∝ V³',{fs:10.5})+T(X(18.5),Y(0.82),'III  rated power\n(pitch / stall)',{fs:10.5})+T(X(26.5),Y(0.4),'IV\nshut\ndown',{fs:10.5,c:'s'})+T(X(0)-6,Y(1),'Pr',{a:'end',fs:11});
+  return wrap(480,246,s,'Power curve of a wind turbine')}
 
 /* ---------- solar ---------- */
 function cell(){let s='';const x=60,w=300;
@@ -78,8 +78,8 @@ function cell(){let s='';const x=60,w=300;
   s+=`<rect x="${x}" y="44" width="${w}" height="8" class="arc"/><rect x="${x}" y="52" width="${w}" height="26" class="nlay"/><rect x="${x}" y="78" width="${w}" height="70" class="play"/><rect x="${x}" y="148" width="${w}" height="12" class="metal"/>`;
   s+=Ln([[x,78],[x+w,78]],{c:'l',d:'5 3'});[[0,'sunlight']].forEach(()=>{for(let i=0;i<4;i++)s+=A([[x+45+i*70,4],[x+55+i*70,30]],{c:'l sun'})});
   s+=C(x+120,64,5,'eh e')+T(x+120,64,'−',{fs:10,c:'w'})+C(x+150,108,5,'eh h')+T(x+150,108,'+',{fs:10,c:'w'})+A([[x+150,100],[x+150,82]],{c:'l'})+A([[x+120,72],[x+120,58]],{c:'l'});
-  const L=[[39,'front grid contact'],[48,'anti-reflection coating'],[65,'n-type Si (thin, P-doped)'],[78,'p–n junction'],[113,'p-type Si (B-doped)'],[154,'back contact']];
-  L.forEach(([y,t])=>{s+=Ln([[x+w,y],[x+w+16,y]],{c:'l thin'})+T(x+w+20,y,t,{a:'start',fs:11})});
+  const L=[[39,22,'front grid contact'],[48,44,'anti-reflection coating'],[65,65,'n-type Si (thin, P-doped)'],[78,86,'p–n junction'],[113,113,'p-type Si (B-doped)'],[154,154,'back contact']];
+  L.forEach(([y,ly,t])=>{s+=Ln([[x+w,y],[x+w+8,y],[x+w+16,ly]],{c:'l thin'})+T(x+w+20,ly,t,{a:'start',fs:11})});
   s+=P(`M${x-6} 154 L${x-30} 154 L${x-30} 39 L${x+20} 39`,'l');s+=B(x-46,82,32,28,'Load','b',{fs:10,r:4});
   return wrap(560,172,s,'Construction of a silicon solar cell')}
 function equiv(){let s='';const y1=40,y2=170;s+=Ln([[40,y1],[460,y1]])+Ln([[40,y2],[460,y2]]);
@@ -96,11 +96,11 @@ function fpc(){let s='';s+=`<rect x="40" y="60" width="420" height="90" rx="4" c
   s+=T(220,92,'re-radiated IR trapped',{fs:10,c:'s'});return wrap(600,165,s,'Flat plate collector (cross-section)')}
 function ptc(plant){let s='';const fx=200,fy=70;s+=P('M60 40 Q200 210 340 40','l thick c3s');for(let i=0;i<5;i++){const x=90+i*55,t=(x-60)/280,yy=(1-t)*(1-t)*40+2*(1-t)*t*210+t*t*40;s+=A([[x,8],[x,yy-2]],{c:'l sun'})+Ln([[x,yy],[fx,fy]],{c:'l sun',d:'3 2'})}
   s+=C(fx,fy,9,'pipe')+C(fx,fy,14,'glassc')+Ln([[fx,fy+14],[fx,170]])+P('M180 170 L220 170 L210 180 L190 180 Z','b');
-  s+=T(fx+22,fy-18,'absorber tube in\nevacuated glass',{a:'start',fs:10.5})+T(70,130,'parabolic\nmirror',{fs:10.5,c:'s'})+T(fx,192,'single-axis tracking',{fs:10.5,c:'s'});
+  s+=T(fx-20,fy-24,'absorber tube in\nevacuated glass',{a:'end',fs:10.5})+T(70,130,'parabolic\nmirror',{fs:10.5,c:'s'})+T(fx,192,'single-axis tracking',{fs:10.5,c:'s'});
   if(plant){s+=B(390,40,120,40,'Heat exchanger\n/ boiler','c1',{fs:10.5})+B(540,40,90,40,'Turbine','c2',{fs:11})+B(540,110,90,40,'Generator','c6',{fs:11})+B(390,110,120,40,'Condenser','b',{fs:11});
-    s+=A([[fx+14,fy-6],[388,52]],{c:'l hot'})+T(300,45,'hot oil 390 °C',{fs:10,c:'s'})+A([[388,70],[fx+14,fy+6]],{c:'l cold'})+A([[510,60],[538,60]])+Ln([[585,80],[585,108]])+A([[540,70],[520,130],[512,130]])+A([[450,110],[450,82]])}
+    s+=A([[fx+14,fy-6],[388,52]],{c:'l hot'})+T(288,43,'hot oil 390 °C',{fs:10,c:'s'})+A([[388,70],[fx+14,fy+6]],{c:'l cold'})+A([[510,60],[538,60]])+Ln([[585,80],[585,108]])+A([[540,70],[520,130],[512,130]])+A([[450,110],[450,82]])}
   return wrap(plant?650:380,205,s,plant?'Parabolic trough collector and solar thermal power plant':'Parabolic trough collector (line focus)')}
-function tower(plant){let s='';s+=`<rect x="190" y="40" width="20" height="150" class="tower"/><rect x="176" y="22" width="48" height="22" rx="4" class="absorb"/>`+T(232,30,'receiver',{a:'start',fs:10.5});
+function tower(plant){let s='';s+=`<rect x="190" y="40" width="20" height="150" class="tower"/><rect x="176" y="22" width="48" height="22" rx="4" class="absorb"/>`+T(200,10,'receiver',{fs:10.5});
   [[40,170],[80,178],[120,184],[280,184],[320,178],[360,170]].forEach(([x,y])=>{s+=Ln([[x,y],[x,y+14]])+`<rect x="${x-14}" y="${y-4}" width="28" height="5" class="mirror" transform="rotate(${x<200?-18:18} ${x} ${y})"/>`+Ln([[x,y-4],[200,34]],{c:'l sun',d:'3 2'})+A([[x+(x<200?-30:30),y-90],[x,y-8]],{c:'l sun'})});
   s+=T(80,205,'heliostats (2-axis tracking)',{fs:10.5,c:'s'})+T(200,205,'tower',{fs:10.5,c:'s'});
   if(plant){s+=B(420,20,110,36,'Hot salt tank\n565 °C','c3',{fs:10})+B(420,76,110,36,'Steam generator','c1',{fs:10.5})+B(560,76,90,36,'Turbine','c2',{fs:11})+B(560,140,90,36,'Generator','c6',{fs:11})+B(420,140,110,36,'Cold salt tank','c1',{fs:10.5});
@@ -123,7 +123,7 @@ function sunshine(){let s=C(150,70,34,'glassc')+P('M86 70 A64 64 0 0 0 214 70','
 function otecClosed(){let s=B(150,30,130,46,'EVAPORATOR','c3',{fs:11.5,fw:600})+B(360,30,110,46,'TURBINE','c2',{fs:11.5,fw:600})+B(360,140,110,46,'CONDENSER','c1',{fs:11.5,fw:600})+B(150,140,130,46,'FEED PUMP','b',{fs:11.5,fw:600})+B(500,30,90,46,'Generator','c6',{fs:11});
   s+=A([[280,53],[358,53]])+T(320,42,'NH₃ vapour',{fs:10,c:'s'})+A([[415,76],[415,138]])+T(422,107,'low-p vapour',{a:'start',fs:10,c:'s'})+A([[360,163],[282,163]])+T(320,176,'liquid NH₃',{fs:10,c:'s'})+A([[215,140],[215,78]])+Ln([[470,53],[500,53]],{c:'l thick'});
   s+=A([[20,40],[148,40]],{c:'l hot'})+T(20,28,'warm surface water 26 °C',{a:'start',fs:10.5})+A([[148,66],[40,66],[40,80]],{c:'l hot'})+T(44,92,'out ≈ 23 °C',{a:'start',fs:10,c:'s'});
-  s+=A([[600,150],[472,150]],{c:'l cold'})+T(600,138,'cold deep water 5 °C (≈1000 m)',{a:'end',fs:10.5})+A([[472,176],[600,176],[600,190]],{c:'l cold'});
+  s+=A([[600,150],[472,150]],{c:'l cold'})+T(600,128,'cold deep water 5 °C (≈1000 m)',{a:'end',fs:10.5})+A([[472,176],[600,176],[600,190]],{c:'l cold'});
   return wrap(620,200,s,'Closed-cycle (Anderson) OTEC')}
 function otecOpen(){let s=flow([{t:'Warm seawater\n27 °C',c:'c3'},{t:'Deaerator',c:'b'},{t:'Flash evaporator\n(vacuum ≈ 3 kPa)',c:'c3'},{t:'LP steam turbine\n+ generator',c:'c2'},{t:'Surface condenser',c:'c1'},{t:'Fresh water',c:'c6'}],{cols:3,w:150,cap:'Open-cycle (Claude) OTEC: cold deep water condenses the steam; vacuum pump removes gases'});return s}
 function otecHybrid(){let s=B(20,30,140,46,'Warm seawater','c3',{fs:11})+B(200,30,150,46,'Flash chamber\n(vacuum)','c3',{fs:11})+B(200,120,150,46,'Evaporator\n(steam → NH₃)','c7',{fs:11})+B(20,120,140,46,'Fresh water\n(condensate)','c6',{fs:11});
@@ -163,7 +163,7 @@ function multiblade(){let s=C(120,90,58,'b');for(let i=0;i<16;i++){const a=i*Mat
   s+=C(120,90,10,'cd')+Ln([[130,90],[250,90]],{c:'l thick'})+P('M250 70 L300 90 L250 110 Z','b')+`<rect x="116" y="100" width="8" height="110" class="tower"/>`+Ln([[120,150],[120,210]],{c:'l',d:'4 3'});
   s+=T(260,130,'tail vane keeps rotor\nfacing the wind',{a:'start',fs:11})+T(136,180,'pump rod',{a:'start',fs:11,c:'s'});return wrap(400,220,s,'Multi-bladed (American) windmill for water pumping')}
 function anemometer(){let s=`<rect x="146" y="70" width="8" height="90" class="tower"/>`+Ln([[60,60],[240,60]],{c:'l thick'})+Ln([[150,20],[150,100]],{c:'l thick'})+P('M40 60 A20 20 0 0 1 80 60 Z','cup')+P('M220 60 A20 20 0 0 0 260 60 Z','cup')+C(150,60,6,'cd');
-  s+=B(110,160,80,28,'Generator','c6',{fs:10.5,r:4})+A([[190,174],[260,174]])+B(262,160,100,28,'m/s display','b',{fs:10.5,r:4})+T(270,40,'cups on arms; speed ∝ wind',{a:'start',fs:11});
+  s+=B(110,160,80,28,'Generator','c6',{fs:10.5,r:4})+A([[190,174],[260,174]])+B(262,160,100,28,'m/s display','b',{fs:10.5,r:4})+T(372,22,'cups on arms; speed ∝ wind',{a:'end',fs:11});
   return wrap(380,200,s,'Cup anemometer')}
 
 /* ---------- biomass ---------- */
@@ -190,7 +190,7 @@ function fuelCell(o={}){let s=`<rect x="120" y="60" width="70" height="150" clas
   return wrap(460,220,s,o.cap||'Hydrogen–oxygen fuel cell')}
 function electrolysis(){let s=`<rect x="80" y="60" width="300" height="150" rx="6" class="vessel"/><rect x="88" y="100" width="284" height="104" class="water"/>`+`<rect x="140" y="50" width="14" height="140" class="metal"/><rect x="306" y="50" width="14" height="140" class="metal"/><rect x="228" y="70" width="4" height="138" class="dam"/>`;
   s+=P('M147 50 L147 20 L313 20 L313 50','l')+B(196,8,68,24,'DC supply','cd',{fs:10,r:4})+T(147,40,'+',{fs:14,a:'end'})+T(316,40,'−',{fs:14,a:'start'});
-  for(let i=0;i<4;i++){s+=C(165+i*6,170-i*20,3,'bub')+C(296-i*6,170-i*20,3,'bub')}s+=T(110,80,'ANODE: O₂',{a:'start',fs:10.5})+T(350,80,'CATHODE: H₂',{a:'end',fs:10.5})+T(230,222,'KOH electrolyte; diaphragm separates the gases',{fs:10.5,c:'s'});
+  for(let i=0;i<4;i++){s+=C(165+i*6,170-i*20,3,'bub')+C(296-i*6,170-i*20,3,'bub')}s+=T(134,82,'ANODE\n(O₂)',{a:'end',fs:10})+T(326,82,'CATHODE\n(H₂)',{a:'start',fs:10})+T(230,222,'KOH electrolyte; diaphragm separates the gases',{fs:10.5,c:'s'});
   s+=A([[160,60],[160,30],[120,30]],{c:'l thin'})+A([[300,60],[300,30],[400,30]],{c:'l thin'})+T(70,30,'O₂ out',{fs:10.5})+T(430,30,'H₂ out',{fs:10.5});
   return wrap(470,232,s,'Electrolysis of water')}
 
@@ -198,7 +198,7 @@ function electrolysis(){let s=`<rect x="80" y="60" width="300" height="150" rx="
 function francis(){let s=P('M220 40 A110 110 0 1 1 110 150 L60 150 L60 120 L110 120 A80 80 0 0 0 110 150','scroll')+C(220,150,70,'b')+C(220,150,46,'c1');
   for(let i=0;i<12;i++){const a=i*Math.PI/6;s+=Ln([[220+52*Math.cos(a),150+52*Math.sin(a)],[220+66*Math.cos(a+0.25),150+66*Math.sin(a+0.25)]],{c:'l thin'})}
   for(let i=0;i<10;i++){const a=i*Math.PI/5;s+=P(`M${r1(220+14*Math.cos(a))} ${r1(150+14*Math.sin(a))} Q${r1(220+30*Math.cos(a+0.5))} ${r1(150+30*Math.sin(a+0.5))} ${r1(220+44*Math.cos(a+0.2))} ${r1(150+44*Math.sin(a+0.2))}`,'l c1s')}
-  s+=C(220,150,10,'cd')+A([[20,135],[58,135]],{c:'l hl'})+T(20,120,'from penstock',{a:'start',fs:10.5});
+  s+=C(220,150,10,'cd')+A([[20,135],[58,135]],{c:'l hl'})+T(20,107,'from penstock',{a:'start',fs:10.5});
   [[[260,46],'spiral casing'],[[284,150],'guide vanes (adjustable)'],[[240,130],'runner: radial in, axial out'],[[220,150],'shaft → draft tube']].forEach(([[x,y],t],i)=>s+=Ln([[x,y],[360,50+i*34]],{c:'l thin'})+T(366,50+i*34,t,{a:'start',fs:11}));
   return wrap(540,275,s,'Francis turbine (plan view)')}
 function kaplan(){let s=`<rect x="120" y="20" width="20" height="180" class="metal"/>`+P('M130 120 L60 100 L60 112 L130 128 Z','bladeF')+P('M130 120 L200 100 L200 112 L130 128 Z','bladeF')+P('M130 140 L80 160 L84 168 L130 148 Z','bladeF')+P('M130 140 L180 160 L176 168 L130 148 Z','bladeF');
@@ -206,7 +206,7 @@ function kaplan(){let s=`<rect x="120" y="20" width="20" height="180" class="met
   return wrap(420,260,s,'Kaplan (adjustable-blade propeller) turbine')}
 function pelton(){let s=C(260,120,80,'b');for(let i=0;i<14;i++){const a=i*2*Math.PI/14,x=260+80*Math.cos(a),y=120+80*Math.sin(a);s+=`<ellipse cx="${r1(x)}" cy="${r1(y)}" rx="12" ry="8" transform="rotate(${r1(a*180/Math.PI)} ${r1(x)} ${r1(y)})" class="cup"/>`}
   s+=C(260,120,14,'cd')+`<rect x="20" y="28" width="140" height="16" class="metal"/>`+P('M160 28 L196 34 L196 38 L160 44 Z','metal')+P('M150 36 L184 36','l thick c3s')+A([[196,36],[248,40]],{c:'l hl'});
-  s+=T(20,16,'penstock → nozzle with spear valve',{a:'start',fs:10.5})+T(212,56,'jet',{fs:10.5})+T(352,70,'double-cup (split)\nbuckets',{a:'start',fs:11})+T(352,170,'runner at\natmospheric pressure',{a:'start',fs:11})+T(260,220,'water falls to tail race',{fs:10.5,c:'s'});
+  s+=T(20,16,'penstock → nozzle with spear valve',{a:'start',fs:10.5})+T(224,26,'jet',{fs:10.5})+T(352,70,'double-cup (split)\nbuckets',{a:'start',fs:11})+T(352,170,'runner at\natmospheric pressure',{a:'start',fs:11})+T(260,220,'water falls to tail race',{fs:10.5,c:'s'});
   return wrap(470,232,s,'Pelton wheel (impulse turbine)')}
 function crossflow(){let s=C(220,120,70,'b')+C(220,120,40,'b');for(let i=0;i<20;i++){const a=i*Math.PI/10;s+=P(`M${r1(220+40*Math.cos(a))} ${r1(120+40*Math.sin(a))} Q${r1(220+56*Math.cos(a-0.25))} ${r1(120+56*Math.sin(a-0.25))} ${r1(220+70*Math.cos(a-0.1))} ${r1(120+70*Math.sin(a-0.1))}`,'l c1s')}
   s+=P('M30 40 L170 40 L170 70 L30 70 Z','metal')+A([[40,55],[160,55]],{c:'l hl'})+P('M180 70 C200 110 230 120 260 170','l hl',{arrow:true})+T(30,26,'rectangular nozzle + guide vane',{a:'start',fs:10.5})+T(300,60,'drum runner with\ncurved blades',{a:'start',fs:11})+T(300,180,'water crosses the runner\ntwice (two stages)',{a:'start',fs:11});
@@ -252,7 +252,7 @@ function fta(){let s=B(160,10,180,36,'Fire in storage tank','cd',{fs:11,fw:600})
   s+=Ln([[380,186],[380,196],[280,196],[280,206]])+Ln([[380,196],[380,206]])+Ln([[380,196],[480,196],[480,206]]);[[230,'Spark'],[330,'Static'],[430,'Hot work']].forEach(([x,t])=>s+=B(x,206,100,30,t,'b',{fs:11}));
   s+=Ln([[120,146],[120,206]])+C(120,222,14,'b')+T(120,222,'leak',{fs:9.5});return wrap(540,248,s,'Fault tree (top-down, AND / OR gates)')}
 function pyramid(){const lv=[['Elimination','remove the chemical / process','c6'],['Substitution','use a less hazardous chemical','c2'],['Engineering controls','enclosure, LEV, closed transfer','c1'],['Administrative','SOPs, permits, training, rotation','c7'],['PPE','respirators, gloves, goggles','c3']];let s='';
-  lv.forEach(([t,d,c],i)=>{const y=10+i*40,w1=120+i*70,w2=w1+70,cx=170;s+=P(`M${cx-w1/2} ${y} L${cx+w1/2} ${y} L${cx+w2/2} ${y+36} L${cx-w2/2} ${y+36} Z`,c)+T(cx,y+18,t,{fs:11,fw:600})+T(370,y+18,d,{a:'start',fs:11,c:'s'})});
+  lv.forEach(([t,d,c],i)=>{const y=10+i*40,w1=110+i*56,w2=w1+56,cx=205;s+=P(`M${cx-w1/2} ${y} L${cx+w1/2} ${y} L${cx+w2/2} ${y+36} L${cx-w2/2} ${y+36} Z`,c)+T(cx,y+18,t,{fs:11,fw:600})+T(420,y+18,d,{a:'start',fs:11,c:'s'})});
   s+=A([[640,20],[640,200]],{c:'l'})+T(632,12,'most effective',{a:'end',fs:10,c:'s'})+T(632,208,'least effective',{a:'end',fs:10,c:'s'});return wrap(660,218,s,'Hierarchy of control of chemical hazards')}
 function extinguisher(){let s=`<rect x="80" y="50" width="70" height="160" rx="30" class="ext"/><rect x="80" y="110" width="70" height="20" class="band"/>`+P('M100 50 L100 32 L140 32 L150 22 L156 28 L140 42 L130 42 L130 50','b')+P('M140 36 C190 36 200 80 200 120','l thick')+C(122,38,6,'gauge');
   [[[150,26],'operating lever + safety pin'],[[128,38],'pressure gauge'],[[200,120],'hose / horn / nozzle'],[[150,120],'colour band = agent type'],[[150,170],'cylinder: agent + expellant']].forEach(([[x,y],t],i)=>s+=Ln([[x,y],[250,24+i*40]],{c:'l thin'})+T(256,24+i*40,t,{a:'start',fs:11}));
@@ -268,12 +268,12 @@ function respGrid(){const L=['Applications','Data','Runtime','Middleware','OS','
   L.forEach((l,i)=>s+=T(118,38+i*24,l,{a:'end',fs:10.5}));s+=`<rect x="125" y="226" width="14" height="12" rx="3" class="cd"/>`+T(144,232,'you manage',{a:'start',fs:10.5})+`<rect x="240" y="226" width="14" height="12" rx="3" class="c1"/>`+T(259,232,'provider manages',{a:'start',fs:10.5});
   return wrap(530,245,s,'Responsibility split across service models')}
 function boundaries(){let s=`<rect x="20" y="40" width="200" height="90" rx="8" class="c1"/>`+T(120,56,'Consumer organisational boundary',{fs:10.5,fw:600})+B(50,74,140,36,'on-premise servers','b',{fs:10.5})+`<rect x="280" y="40" width="200" height="90" rx="8" class="c2"/>`+T(380,56,'Provider organisational boundary',{fs:10.5,fw:600})+B(310,74,140,36,'cloud VMs, storage','b',{fs:10.5});
-  s+=`<rect x="10" y="22" width="330" height="120" rx="10" class="trust"/>`+T(175,14,"consumer's trust boundary (extends into the cloud)",{fs:10.5,c:'s'})+Ln([[190,92],[310,92]],{d:'4 3'});return wrap(500,150,s,'Organisational vs trust boundaries')}
+  s+=P('M10 22 H252 V66 H464 V142 H10 Z','trust')+T(130,14,"consumer's trust boundary (extends into the cloud)",{fs:10.5,c:'s'})+Ln([[190,92],[310,92]],{d:'4 3'});return wrap(500,150,s,'Organisational vs trust boundaries')}
 function storageVirt(){let s='';['App 1','App 2','App 3'].forEach((t,i)=>s+=B(60+i*140,10,110,32,t,'c1',{fs:11}));s+=B(40,66,440,30,'Logical volumes / virtual disks (LUNs)','b',{fs:11})+B(40,118,440,46,'VIRTUALIZATION LAYER: mapping logical → physical, pooling,\nthin provisioning, snapshots, replication','cd',{fs:10.5});
   ['Disk array','SAN array','NAS device'].forEach((t,i)=>s+=B(60+i*140,188,110,36,t,'c7',{fs:11})+A([[115+i*140,166],[115+i*140,186]]));[0,1,2].forEach(i=>s+=A([[115+i*140,42],[115+i*140,64]]));s+=A([[260,96],[260,116]]);
   return wrap(520,234,s,'Storage virtualization')}
-function hdfs(){let s=B(150,10,220,44,'NameNode (master)\nnamespace, block map','cd',{fs:11})+B(10,10,110,44,'Client','c1',{fs:11})+B(400,10,120,44,'Secondary\nNameNode','b',{fs:10.5});
-  s+=A([[120,32],[148,32]])+T(134,22,'metadata',{fs:9,c:'s'})+Ln([[370,32],[398,32]],{d:'4 3'});
+function hdfs(){let s=B(150,10,220,44,'NameNode (master)\nnamespace, block map','cd',{fs:11})+B(10,10,96,44,'Client','c1',{fs:11})+B(400,10,120,44,'Secondary\nNameNode','b',{fs:10.5});
+  s+=A([[106,32],[148,32]])+T(127,22,'metadata',{fs:9,c:'s'})+Ln([[370,32],[398,32]],{d:'4 3'});
   [['B1 B2',0],['B1 B3',1],['B2 B3',2]].forEach(([b,i])=>{const x=40+i*165;s+=B(x,110,140,60,'DataNode '+(i+1)+'\n'+b,'c2',{fs:11})+A([[x+70,108],[260,56]],{c:'l',d:'4 3'})});
   s+=A([[64,54],[100,108]])+T(70,86,'read / write blocks',{a:'start',fs:10,c:'s'})+T(260,190,'blocks of 128 MB, each replicated 3 times; heartbeats + block reports to NameNode',{fs:10.5,c:'s'});return wrap(530,200,s,'HDFS architecture')}
 function mapreduce(){const col=(x,t)=>T(x,14,t,{fs:11,fw:600});let s=col(60,'Input splits')+col(210,'Map')+col(370,'Shuffle & sort')+col(510,'Reduce');

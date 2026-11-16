@@ -292,6 +292,18 @@ body.print.allmods .mod{break-before:auto;margin-top:14px}
 
 /* drawn figures */
 .fig.sm{padding:4px 8px;margin:.2em 0 .6em}
+/* point-wise answers */
+.body .lead{color:var(--ink);font-weight:500;margin:.25em 0 .5em}
+.body p.lbl{margin:.75em 0 .15em}.body p.lbl+ul{margin-top:.15em}
+.body li{line-height:1.5}.body li::marker{color:#7d8fe6}
+.body ul.pts{margin:.3em 0 .55em}.body ul.pts>li{margin:.3em 0}
+.body ul.sub{margin:.2em 0 .1em;padding-left:15px;font-size:.95em}.body ul.sub>li{margin:.12em 0}.body ul.sub>li::marker{content:"– ";color:#98a2b3}
+body.print .body .lead{margin:.15em 0 .3em}body.print .body p.lbl{margin:.45em 0 .1em}
+body.print .body ul.pts{margin:.2em 0 .35em}body.print .body ul.pts>li{margin:.14em 0}body.print .body li{line-height:1.42}
+body.print .body ul.sub{margin:.1em 0 .05em;padding-left:12px}body.print .body ul.sub>li{margin:.06em 0}
+/* white halo behind figure labels so lines and curves never run through the text */
+@media screen{.fig svg text:not(.w):not([fill="#fff"]):not([fill="#ffffff"]):not([fill="white"]){paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round;stroke-opacity:.92}}
+body.print .fig svg text.halo-bg{fill:#fff;stroke:#fff}
 .fx text.t{fill:#101828;font-family:var(--f)}.fx text.s{fill:#667085}.fx text.w{fill:#fff}
 .fx .b{fill:#fff;stroke:#98a2b3;stroke-width:1.2}
 .fx .c1{fill:#eef3ff;stroke:#7d8fe6;stroke-width:1.2}.fx .c2{fill:#e6f6f3;stroke:#5fbcae;stroke-width:1.2}.fx .c3{fill:#fef0e8;stroke:#f09a73;stroke-width:1.2}

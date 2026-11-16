@@ -28,6 +28,8 @@ python src/build.py src/ait401-base.html .
 
 This writes `out/index.html` (copy it to the repo root) plus print pages used to make the PDFs with headless Edge/Chrome (`--print-to-pdf`).
 
+Answers are shown point-wise: when a subject loads, `src/app.js` (`POINTS`) turns multi-sentence paragraphs into a short lead line plus bullets, splits long bullets and `a; b; c` lists into sub-points, and draws figure labels on top of the lines with a white halo. The source answers in `data/` stay as written. Make the PDFs with the Inter, Inter Tight, Source Serif 4 and IBM Plex Mono fonts installed (copies are in `android/fonts/`) so the layout matches.
+
 ## Android app
 
 `app/PYQ-Bank.apk` is the same site packaged as an offline Android app (Android 7+). All 48 PDFs are inside it; tapping a PDF button offers Open, Share or Save to Downloads, and the Back button steps back through the views.

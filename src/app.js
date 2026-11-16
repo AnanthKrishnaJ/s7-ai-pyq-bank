@@ -9,8 +9,61 @@ const SCOL={AIT401:'var(--s-ait)',CST423:'var(--s-cst)',EET435:'var(--s-eet)',MC
 let SUB,PAPERS,MODS,QB,PBY,ORDER,OCC,OBY;
 const isExam=pid=>!PBY[pid].model;
 
+/* ---- point-wise answers: long paragraphs become short bullets, long bullets get sub-points ---- */
+const POINTS=(()=>{
+  const ABBR=/(?:\b(?:e\.g|i\.e|etc|vs|viz|cf|approx|Fig|fig|Figs|Eq|eq|Eqs|No|Nos|Dr|Mr|Ms|St|al|Ltd|Inc|Sec|resp|esp|incl|Co|Corp|Dept|Govt|min|max|avg|wrt|w\.r\.t|ft|in|sq|mm|Vol|Ch|pp|Ref|Std)|(?:^|[\s(])[A-Z])\.$/;
+  const START=/^["“‘(]?[A-Z0-9∂∇√ΔΣΩαβγδηλμσθπρω]/;
+  const BOUND=/([.!?])(["”’)]?)(\s+)|(;)(\s+)/g;
+  const semis=el=>[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.nodeValue.split(';').length-1).reduce((a,b)=>a+b,0);
+  const BLOCK='table,figure,svg,ul,ol,img,.eqb,.tw,.calc,div,canvas';
+  const txt=n=>n?n.textContent:'';
+  function split(el){const out=[];let cur=[];const kids=[...el.childNodes],semi=semis(el)>=2;
+    const push=()=>{if(cur.some(n=>n.nodeType===1||n.nodeValue.trim()))out.push(cur);cur=[]};
+    kids.forEach((n,k)=>{
+      if(n.nodeType===1&&n.tagName==='BR'){push();return}
+      if(n.nodeType!==3){cur.push(n);return}
+      const t=n.nodeValue;let last=0,m;BOUND.lastIndex=0;
+      while((m=BOUND.exec(t))){
+        if(m[4]){if(!semi)continue;cur.push(document.createTextNode(t.slice(last,m.index)));push();last=m.index+m[0].length;continue}
+        const end=m.index+m[1].length+m[2].length,rest=t.slice(m.index+m[0].length);
+        const nextTxt=rest.length?rest:txt(kids[k+1]);
+        const before=cur.map(txt).join('')+t.slice(last,m.index+1);
+        if(!START.test(nextTxt.trimStart())||ABBR.test(before.slice(-14)))continue;
+        if(rest.length===0&&!(kids[k+1]&&kids[k+1].nodeType===1&&/^(B|STRONG|I|EM|CODE|SPAN|A|SUB|SUP)$/.test(kids[k+1].tagName)))continue;
+        cur.push(document.createTextNode(t.slice(last,end)));push();last=m.index+m[0].length}
+      if(last<t.length)cur.push(document.createTextNode(t.slice(last)))});
+    push();return out}
+  const li=(nodes,cls)=>{const e=document.createElement('li');nodes.forEach(n=>e.appendChild(n));if(cls)e.className=cls;return e};
+  const trimStart=nodes=>{const f=nodes[0];if(f&&f.nodeType===3){f.nodeValue=f.nodeValue.replace(/^\s+/,'').replace(/^([a-z])(?=[a-z]+\b)/,c=>c.toUpperCase())}return nodes};
+  function para(p,first){
+    if(p.className||p.querySelector(BLOCK))return;
+    const S=split(p);if(S.length<2)return;
+    const frag=document.createDocumentFragment();
+    // a bold "Label:" opening the paragraph becomes a small heading for its points
+    const f0=S[0][0];
+    if(f0&&f0.nodeType===1&&/^(B|STRONG)$/.test(f0.tagName)&&/:\s*$/.test(f0.textContent)){
+      const h=document.createElement('p');h.className='lbl';h.appendChild(f0);frag.appendChild(h);S[0].shift();trimStart(S[0]);
+      if(!S[0].length||!S[0].some(n=>txt(n).trim()))S.shift()}
+    else if(first){const lead=document.createElement('p');lead.className='lead';S.shift().forEach(n=>lead.appendChild(n));frag.appendChild(lead)}
+    let tail=null;if(S.length&&/:\s*$/.test(S[S.length-1].map(txt).join(''))){tail=document.createElement('p');S.pop().forEach(n=>tail.appendChild(n))}
+    if(S.length){const ul=document.createElement('ul');ul.className='pts';S.forEach(s=>ul.appendChild(li(trimStart(s))));frag.appendChild(ul)}
+    if(tail)frag.appendChild(tail);
+    p.replaceWith(frag)}
+  function item(e){
+    if(e.querySelector(BLOCK)||e.textContent.length<110)return;
+    const S=split(e);if(S.length<2)return;
+    const f0=S[0][0];let head;
+    if(semis(e)>=2&&f0&&f0.nodeType===1&&/^(B|STRONG)$/.test(f0.tagName)&&/:\s*$/.test(f0.textContent)){head=[S[0].shift()];trimStart(S[0])}else head=S.shift();e.textContent='';head.forEach(n=>e.appendChild(n));
+    const ul=document.createElement('ul');ul.className='sub';S.forEach(s=>ul.appendChild(li(trimStart(s))));e.appendChild(ul)}
+  return html=>{if(!html||typeof html!=='string')return html;const d=document.createElement('div');d.innerHTML=html;
+    const ps=[...d.children].filter(e=>e.tagName==='P');ps.forEach((p,i)=>para(p,i===0&&d.firstElementChild===p));
+    d.querySelectorAll('ul:not(.sub)>li,ol>li').forEach(e=>{if(!e.closest('table,figure'))item(e)});
+    /* labels on top: draw each figure's text after its lines so the label halo can mask them */
+    d.querySelectorAll('svg').forEach(svg=>[...svg.children].filter(e=>e.tagName.toLowerCase()==='text').forEach(t=>svg.appendChild(t)));
+    return d.innerHTML}})();
+
 /* build occurrences once per subject */
-function prep(code){const X=SUBJ[code];if(X._occ)return X;applyFigs(X);
+function prep(code){const X=SUBJ[code];if(X._occ)return X;applyFigs(X);X.QB.forEach(q=>{if(q.a)q.a=POINTS(q.a);if(q.a3)q.a3=POINTS(q.a3)});
   const pby=Object.fromEntries(X.PAPERS.map(p=>[p.id,p])),order=X.PAPERS.map(p=>p.id),exam=pid=>!pby[pid].model,occ=[],oby={};
   /* Part A is always two per module: Q1–2 Module 1, Q3–4 Module 2, … Q9–10 Module 5 */
   X.PAPERS.forEach(P=>{P.A.forEach(([t],i)=>occ.push({key:`${P.id}:Q${i+1}`,pid:P.id,qno:i+1,sub:'',label:`Q${i+1}`,text:t,mk:3,part:'A',m:Math.ceil((i+1)/2)}));
@@ -290,7 +343,19 @@ function printDoc(){const ex=PAPERS.filter(p=>!p.model),model=PAPERS.some(p=>p.m
   return h}
 
 /* -------- boot -------- */
-if(PRINT){load(window.PRINT_SUBJ||'AIT401');document.body.classList.add('print');$('#app').innerHTML=printDoc();$('#app').querySelectorAll('button').forEach(b=>{b.outerHTML=`<span class="${b.className}">${b.innerHTML}</span>`})}
+/* PDF: give a white halo only to figure labels that a line or curve actually runs through
+   (a halo on every label would bloat the PDFs; on screen every label gets one via CSS) */
+function haloFigs(root){root.querySelectorAll('figure.fig svg').forEach(svg=>{
+  const geoms=[...svg.querySelectorAll('line,path,polyline,polygon,circle,ellipse,rect')].filter(g=>{const cs=getComputedStyle(g);return cs.stroke!=='none'&&parseFloat(cs.strokeWidth)>0});
+  const pts=[];geoms.forEach(g=>{let L=0;try{L=g.getTotalLength()}catch(e){return}const M=g.getScreenCTM();if(!M||!L)return;const n=Math.min(600,Math.max(4,Math.ceil(L/2)));
+    for(let i=0;i<=n;i++){const p=g.getPointAtLength(L*i/n);pts.push([M.a*p.x+M.c*p.y+M.e,M.b*p.x+M.d*p.y+M.f])}});
+  svg.querySelectorAll('text').forEach(t=>{const f=t.getAttribute('fill');if(t.classList.contains('w')||/^(#fff|#ffffff|white)$/i.test(f||''))return;
+    const r=t.getBoundingClientRect(),py=r.height*.2;let c=0;for(const [x,y] of pts){if(x>r.left&&x<r.right&&y>r.top+py&&y<r.bottom-py&&++c>1){t.classList.add('halo');break}}});
+  /* PDF renderers ignore paint-order, so the halo is a white copy drawn underneath the label */
+  svg.querySelectorAll('text.halo,text[paint-order]').forEach(t=>{if(t.previousElementSibling&&t.previousElementSibling.classList.contains('halo-bg'))return;
+    const b=t.cloneNode(true);b.setAttribute('class','halo-bg');b.setAttribute('fill','#fff');b.setAttribute('stroke','#fff');b.setAttribute('stroke-width','3.5');b.setAttribute('stroke-linejoin','round');b.removeAttribute('paint-order');b.setAttribute('aria-hidden','true');
+    t.parentNode.insertBefore(b,t);t.removeAttribute('stroke');t.removeAttribute('paint-order');t.removeAttribute('stroke-width');t.classList.remove('halo')})})}
+if(PRINT){load(window.PRINT_SUBJ||'AIT401');document.body.classList.add('print');$('#app').innerHTML=printDoc();$('#app').querySelectorAll('button').forEach(b=>{b.outerHTML=`<span class="${b.className}">${b.innerHTML}</span>`});haloFigs(document);if(document.fonts)document.fonts.ready.then(()=>haloFigs(document))}
 else{fromHash();picker();figures();measure();bind();render(false);setupMotion();examsInit();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure();moveInd('#views','button');moveInd('#seg','button')});
   try{window.claude&&window.claude.use&&window.claude.use('downloads').then(d=>{DL=d}).catch(()=>{})}catch(e){}}

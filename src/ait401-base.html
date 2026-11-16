@@ -324,14 +324,14 @@ one(k){const A=ACT[k];const p=PLOT([{f:A.f,c:C.b,n:A.n}],40,25,260,130,A.xr,A.yr
   return wrap(330,180,s,A.t+(k==='tanh'?': output in (−1, 1), zero-centred; dashed line is its derivative 1 − tanh²x (max 1 at x = 0).':''))},
 actd(){const p=PLOT([{f:x=>{const s=1/(1+Math.exp(-x));return s*(1-s)},c:C.b,label:'σ′(x): max 0.25',lx:[1.5,.45],la:'start'},{f:x=>1-Math.tanh(x)**2,c:C.p,label:'tanh′(x): max 1',lx:[1.25,.9],la:'start'}],45,25,390,140,[-6,6],[0,1.1],{yt:[0,.25,1],xt:[-6,-3,0,3,6],xl:'input x'});
   let s=p.s+`<rect x="${f1(p.X(-6))}" y="25" width="${f1(p.X(-3)-p.X(-6))}" height="140" fill="${C.r}" fill-opacity=".07"/><rect x="${f1(p.X(3))}" y="25" width="${f1(p.X(6)-p.X(3))}" height="140" fill="${C.r}" fill-opacity=".07"/>`;
-  s+=T(p.X(-4.5),40,'saturated:\ngradient ≈ 0',{fs:10,c:C.r})+T(p.X(4.5),40,'saturated:\ngradient ≈ 0',{fs:10,c:C.r});
+  s+=T(p.X(-4.5),140,'saturated:\ngradient ≈ 0',{fs:10,c:C.r})+T(p.X(4.5),140,'saturated:\ngradient ≈ 0',{fs:10,c:C.r});
   return wrap(460,212,s,'Derivatives of sigmoid and tanh. Both are small away from 0, so multiplying many of them makes gradients vanish.')},
 reluFit(){const p=PLOT([{f:x=>(x-2)**2,c:C.b,label:'f(x) = (x − 2)²',lx:[.9,6.2]},{f:x=>3*Math.max(0,x-2),c:C.o,d:'6 4',label:'network: 3·ReLU(x − 2)',lx:[3.2,1.2],la:'start'}],40,20,330,140,[0,5],[0,9.5],{yt:[0,4,9],xt:[0,1,2,3,4,5],xl:'x'});
   return wrap(400,195,p.s,'The best a 1-neuron-per-layer ReLU net can do: match the rising half exactly at x = 2 and x = 5.')},
-regLoss(){const d=1;const p=PLOT([{f:e=>e*e,c:C.b,label:'MSE: e²',lx:[1,3.8],la:'end'},{f:Math.abs,c:C.o,label:'MAE: |e|',lx:[2.1,1.6],la:'start'},{f:e=>Math.abs(e)<=d?.5*e*e:d*(Math.abs(e)-.5*d),c:C.g,d:'6 4',label:'Huber (δ = 1)',lx:[1.2,.45],la:'start'}],40,20,330,140,[-3,3],[0,4.5],{yt:[0,2,4],xt:[-3,0,3],xl:'error e = y − ŷ'});
+regLoss(){const d=1;const p=PLOT([{f:e=>e*e,c:C.b,label:'MSE: e²',lx:[1,3.8],la:'end'},{f:Math.abs,c:C.o,label:'MAE: |e|',lx:[2.95,3.35],la:'end'},{f:e=>Math.abs(e)<=d?.5*e*e:d*(Math.abs(e)-.5*d),c:C.g,d:'6 4',label:'Huber (δ = 1)',lx:[1.2,.45],la:'start'}],40,20,330,140,[-3,3],[0,4.5],{yt:[0,2,4],xt:[-3,0,3],xl:'error e = y − ŷ'});
   return wrap(400,195,p.s,'Regression losses: MSE grows fast for big errors, MAE grows linearly, Huber is quadratic near 0 and linear beyond δ.')},
 biasvar(){const b=c=>3.1/(c+.55),v=c=>.032*c*c+.04,nz=.35,tot=c=>b(c)+v(c)+nz;let best=0,bv=1e9;for(let c=.2;c<10;c+=.01){if(tot(c)<bv){bv=tot(c);best=c}}
-  const p=PLOT([{f:b,c:C.b,label:'Bias²',lx:[1.1,b(1.1)+.45]},{f:v,c:C.p,label:'Variance',lx:[8.6,v(8.6)-.35]},{f:()=>nz,c:C.line,d:'4 4',label:'noise (irreducible)',lx:[3.2,.16]},{f:tot,c:C.ink,w:2.6,label:'Total error',lx:[8.4,tot(8.4)+.4]}],45,22,390,150,[0,10],[0,5],{yl:'Error'});
+  const p=PLOT([{f:b,c:C.b,label:'Bias²',lx:[1.9,.74],la:'start'},{f:v,c:C.p,label:'Variance',lx:[9.7,1.6],la:'end'},{f:()=>nz,c:C.line,d:'4 4',label:'noise (irreducible)',lx:[9.8,.13],la:'end'},{f:tot,c:C.ink,w:2.6,label:'Total error',lx:[7.9,3.3],la:'end'}],45,22,390,150,[0,10],[0,5],{yl:'Error'});
   let s=p.s+L(p.X(best),22,p.X(best),172,{c:C.g,d:'4 4'})+T(p.X(best),12,'best model',{fs:10.5,c:C.g,w:600})+T(240,204,'Model complexity (layers, units, training time) →',{fs:10.5,c:C.mute});
   s+=T(p.X(1.2),184,'← underfitting',{fs:10,c:C.mute})+T(p.X(8.8),184,'overfitting →',{fs:10,c:C.mute});
   return wrap(460,218,s,'Bias–variance trade-off: adding capacity lowers bias but raises variance; total test error is U-shaped.')},
@@ -349,7 +349,7 @@ earlystop(){const tr=e=>.07+.82*Math.exp(-e/17),va=e=>.24+.6*Math.exp(-e/14)+.00
 landscape(){let s=L(28,205,470,205,{a:true})+L(28,205,28,12,{a:true})+T(462,218,'parameter w',{fs:10.5,c:C.mute,a:'end'})+T(34,14,'cost J(w)',{fs:10.5,c:C.mute,a:'start'});
   s+=P('M45,110 C70,45 85,30 105,30 C125,30 155,120 175,120 C195,120 215,80 235,80 C255,80 285,132 305,132 C325,132 355,182 385,182 C415,182 435,140 460,100',{c:C.b,w:2.4});
   const pt=(x,y,t,tx,ty,c,a='middle')=>Ci(x,y,4.5,'',{f:c,c})+T(tx,ty,t,{fs:10.5,c,w:600,a});
-  s+=pt(105,30,'Global maximum',118,24,C.r,'start')+pt(175,120,'Local minimum',175,138,C.o)+pt(235,80,'Local maximum',240,64,C.p)+pt(305,132,'Saddle point / plateau\n(∇J = 0 but not a minimum)',318,108,C.v,'start')+pt(385,182,'Global minimum',385,196,C.g);
+  s+=pt(105,30,'Global maximum',118,24,C.r,'start')+pt(175,120,'Local minimum',175,138,C.o)+pt(235,80,'Local maximum',240,64,C.p)+pt(305,132,'Saddle point / plateau\n(∇J = 0 but not a minimum)',300,162,C.v,'end')+pt(385,182,'Global minimum',385,196,C.g);
   return wrap(480,228,s,'Points where the gradient is zero. Gradient descent can stall at a local minimum or a saddle point instead of reaching the global minimum.')},
 vanish(){let s='';const xs=[40,120,200,280,360,440],lab=['x','h₁','h₂','h₃','h₄','ŷ'];
   xs.forEach((x,i)=>{s+=Ci(x,70,17,lab[i],{f:i===0?C.ts:i===5?C.os:C.bs,c:i===0?C.t:i===5?C.o:C.b,fs:12});if(i)s+=E(xs[i-1],70,x,70,17,17,{a:true})});
@@ -377,7 +377,7 @@ gdvar(){let s='';let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483
   return wrap(540,172,s,'Path to the minimum: full batch (exact gradient), one example per step (noisy), and a mini-batch (moderate noise, fastest in practice).')},
 gdbowl(){const J=w=>(w-3)**2+.6;const p=PLOT([{f:J,c:C.b}],40,20,330,140,[0,6],[0,10],{xl:'weight w',yl:'J(w)'});let s=p.s;const ws=[.35,1.6,2.35,2.72,2.9];
   ws.forEach((w,i)=>{s+=Ci(p.X(w),p.Y(J(w)),4.5,'',{f:C.o,c:C.o});if(i)s+=P(`M${f1(p.X(ws[i-1]))},${f1(p.Y(J(ws[i-1]))-7)} Q${f1((p.X(ws[i-1])+p.X(w))/2)},${f1(Math.min(p.Y(J(ws[i-1])),p.Y(J(w)))-24)} ${f1(p.X(w))},${f1(p.Y(J(w))-7)}`,{c:C.o,a:true,w:1.2})});
-  s+=Ci(p.X(3),p.Y(.6),4,'',{f:C.g,c:C.g})+T(p.X(3)+10,p.Y(.6)-12,'minimum',{fs:10,c:C.g,a:'start'})+T(250,44,'w ← w − η · dJ/dw',{fs:12,w:600,c:C.o,a:'start'});
+  s+=Ci(p.X(3),p.Y(.6),4,'',{f:C.g,c:C.g})+T(p.X(3.9),p.Y(.6)-1,'minimum',{fs:10,c:C.g,a:'start'})+T(p.X(3),44,'w ← w − η · dJ/dw',{fs:12,w:600,c:C.o});
   return wrap(400,195,s,'Gradient descent takes repeated steps downhill; the steps shrink as the slope flattens near the minimum.')},
 cnn(){let s='',x=16;const L5=[[80,8,[C.t,C.ts],'Input','32×32×3'],[70,14,[C.b,C.bs],'Conv + ReLU','28×28×6'],[40,14,[C.b,'#dfe7ff'],'Max pool','14×14×6'],[30,26,[C.b,C.bs],'Conv + ReLU','10×10×16'],[18,26,[C.b,'#dfe7ff'],'Max pool','5×5×16']];
   L5.forEach(([h,dw,cc,a,b],i)=>{const o=Math.max(6,h*.28);s+=cuboid(x,100,h,dw,cc)+T(x+(dw+o)/2,168,a,{fs:10.5,w:600})+T(x+(dw+o)/2,182,b,{fs:10,c:C.mute});x+=dw+o;s+=L(x+4,100,x+28,100,{a:true});x+=34});
@@ -418,7 +418,7 @@ res(){let s=T(28,100,'x',{fs:14,w:600})+L(38,100,112,100,{a:true})+Ci(80,100,3,'
   s+=P('M80,100 V38 H490 V83',{c:C.g,w:2,a:true})+T(285,26,'identity shortcut (skip connection): x',{fs:11,c:C.g,w:600});
   s+=T(286,142,'F(x): the residual the layers learn',{fs:10.5,c:C.mute})+T(490,142,'y = F(x) + x',{fs:11.5,w:600,c:C.g});
   return wrap(630,160,s,'Residual block (ResNet). The gradient can flow straight back through the shortcut.')},
-vgg(){let s='',x=12;const blocks=[[2,64,224],[2,128,112],[4,256,56],[4,512,28],[4,512,14]];const hh={224:110,112:88,56:66,28:48,14:34},ww={64:5,128:6,256:7,512:8};
+vgg(){let s='',x=32;const blocks=[[2,64,224],[2,128,112],[4,256,56],[4,512,28],[4,512,14]];const hh={224:110,112:88,56:66,28:48,14:34},ww={64:5,128:6,256:7,512:8};
   blocks.forEach(([nn,ch,sz],bi)=>{const x0=x;for(let i=0;i<nn;i++){s+=`<rect x="${x}" y="${f1(95-hh[sz]/2)}" width="${ww[ch]}" height="${hh[sz]}" fill="${C.bs}" stroke="${C.b}" stroke-width="1"/>`;x+=ww[ch]+3}
     s+=T((x0+x)/2,166,`${nn}× conv ${ch}`,{fs:9.5,w:600})+T((x0+x)/2,180,`${sz}×${sz}`,{fs:9.5,c:C.mute});x+=3;
     s+=`<rect x="${x}" y="${f1(95-hh[sz]/2*0.6)}" width="5" height="${f1(hh[sz]*.6)}" fill="${C.rs}" stroke="${C.r}" stroke-width="1"/>`;x+=44});
@@ -465,7 +465,7 @@ gru(){let s=`<rect x="50" y="22" width="420" height="200" rx="16" fill="#fbfcfe"
   s+=T(120,236,'reset gate',{fs:10,c:C.o})+T(220,236,'update gate',{fs:10,c:C.v})+T(330,236,'candidate',{fs:10,c:C.b});
   return wrap(530,266,s,'GRU cell: hₜ = (1 − zₜ) ⊙ hₜ₋₁ + zₜ ⊙ h̃ₜ. The update gate z mixes old and new state; the reset gate r decides how much history the candidate uses.')},
 seq2seq(){let s=`<rect x="20" y="78" width="250" height="84" rx="12" fill="${C.bs}" fill-opacity=".5" stroke="${C.b}" stroke-dasharray="5 4"/><rect x="355" y="78" width="255" height="84" rx="12" fill="${C.os}" fill-opacity=".5" stroke="${C.o}" stroke-dasharray="5 4"/>`;
-  s+=T(145,66,'Encoder RNN',{fs:11.5,w:600,c:C.b})+T(482,66,'Decoder RNN',{fs:11.5,w:600,c:C.o});
+  s+=T(145,66,'Encoder RNN',{fs:11.5,w:600,c:C.b})+T(482,9,'Decoder RNN',{fs:11.5,w:600,c:C.o});
   [60,145,230].forEach((x,i)=>{s+=R(x-24,100,48,38,'h'+'₁₂₃'[i],{f:'#fff',c:C.b,fs:11})+T(x,196,'x'+'₁₂₃'[i],{fs:12,w:600})+L(x,184,x,140,{a:true});if(i<2)s+=L(x+24,119,x+61,119,{a:true})});
   s+=L(254,119,293,119,{a:true})+Ci(310,119,16,'C',{f:C.ys,c:C.y,fs:13,tw:700})+T(310,150,'context',{fs:10,c:C.y})+L(326,119,372,119,{a:true});
   [398,482,566].forEach((x,i)=>{s+=R(x-24,100,48,38,'s'+'₁₂₃'[i],{f:'#fff',c:C.o,fs:11})+T(x,24,'y'+'₁₂₃'[i],{fs:12,w:600,c:C.o})+L(x,100,x,36,{a:true})+T(x,196,['‹start›','y₁','y₂'][i],{fs:11,c:C.mute})+L(x,184,x,140,{a:true});if(i<2)s+=L(x+24,119,x+60,119,{a:true})});
@@ -498,7 +498,7 @@ lm(ins=['the','cat','sat','on'],outs=['cat','sat','on','the'],cap){let s='';cons
   return wrap(570,236,s,cap||'RNN language model: at every step the hidden state summarises the words so far and softmax gives a probability for every possible next word.')},
 rnntypes(){let s='';const mini=(x0,title,steps)=>{let t=T(x0+56,14,title,{fs:10.5,w:600});const n=steps.length,dx=Math.min(30,96/Math.max(1,n-1));const sx=x0+56-(n-1)*dx/2;
     steps.forEach(([i,o],k)=>{const x=sx+k*dx;t+=R(x-9,72,18,18,'',{r:3,f:C.gs,c:C.g,w:1});if(i){t+=R(x-9,120,18,14,'',{r:3,f:C.rs,c:C.r,w:1})+L(x,120,x,92,{a:true,w:1.1})}if(o){t+=R(x-9,30,18,14,'',{r:3,f:C.bs,c:C.b,w:1})+L(x,72,x,46,{a:true,w:1.1})}if(k<n-1)t+=L(x+9,81,x+dx-9,81,{a:true,w:1.1})});return t};
-  s+=mini(0,'One-to-one',[[1,1]])+mini(125,'One-to-many',[[1,1],[0,1],[0,1]])+mini(250,'Many-to-one',[[1,0],[1,0],[1,1]])+mini(375,'Many-to-many (aligned)',[[1,1],[1,1],[1,1]])+mini(500,'Many-to-many (seq2seq)',[[1,0],[1,0],[0,1],[0,1]]);
+  s+=mini(0,'One-to-one',[[1,1]])+mini(125,'One-to-many',[[1,1],[0,1],[0,1]])+mini(250,'Many-to-one',[[1,0],[1,0],[1,1]])+mini(375,'Many-to-many\n(aligned)',[[1,1],[1,1],[1,1]])+mini(500,'Many-to-many\n(seq2seq)',[[1,0],[1,0],[0,1],[0,1]]);
   s+=T(56,152,'image classification',{fs:9.5,c:C.mute})+T(181,152,'image captioning,\nmusic generation',{fs:9.5,c:C.mute})+T(306,152,'sentiment analysis,\nspam detection',{fs:9.5,c:C.mute})+T(431,152,'POS tagging,\nvideo frame labels',{fs:9.5,c:C.mute})+T(556,152,'machine translation',{fs:9.5,c:C.mute});
   return wrap(620,172,s,'RNN input–output patterns. Red = input, green = hidden state, blue = output.')},
 bert(){let s='';const tk=['[CLS]','my','dog','[MASK]','cute','[SEP]'];tk.forEach((t,i)=>{const x=60+i*96;s+=R(x-38,196,76,26,t,{f:t[0]==='['?C.ys:C.ts,c:t[0]==='['?C.y:C.t,fs:11})+L(x,196,x,170,{a:true})});
@@ -519,9 +519,9 @@ ae(o={}){const layers=o.layers||[6,4,2,4,6];const mid=Math.floor(layers.length/2
 dae(){const noisy=[0,2,5];const N=NET([6,3,6],170,30,220,150,{cols:[[C.t,C.ts],[C.y,C.ys],[C.o,C.os]],names:['corrupted x̃','code h','output x̂']});let s=N.s;
   const c=NET([6],50,30,0,150,{cols:[[C.g,C.gs]],names:['clean x']});s+=c.s;
   c.pos[0].forEach(([x,y],i)=>{s+=L(x+11,y,N.pos[0][i][0]-11,N.pos[0][i][1],{a:true,c:noisy.includes(i)?C.r:C.light,d:noisy.includes(i)?'3 3':''})});
-  noisy.forEach(i=>{const [x,y]=N.pos[0][i];s+=T(x,y-15,'noise',{fs:9,c:C.r})});
-  s+=P(`M390,${N.pos[2][5][1]+26} Q220,236 50,${c.pos[0][5][1]+26}`,{c:C.g,d:'5 4',a:true})+T(220,224,'loss compares x̂ with the clean x',{fs:10.5,c:C.g,w:600});
-  return wrap(450,240,s,'Denoising autoencoder: corrupt the input, then train the network to reconstruct the original clean input.')},
+  noisy.forEach(i=>{const [x,y]=N.pos[0][i];s+=T((c.pos[0][i][0]+x)/2,y-7,'noise',{fs:9,c:C.r})});
+  s+=P(`M390,${N.pos[2][5][1]+38} Q220,252 50,${c.pos[0][5][1]+38}`,{c:C.g,d:'5 4',a:true})+T(220,247,'loss compares x̂ with the clean x',{fs:10.5,c:C.g,w:600});
+  return wrap(450,262,s,'Denoising autoencoder: corrupt the input, then train the network to reconstruct the original clean input.')},
 vae(){let s=R(10,72,64,44,'input x',{f:C.ts,c:C.t,fs:11})+L(74,94,96,94,{a:true});
   s+=P('M98,52 L188,74 L188,114 L98,136 Z',{f:C.bs,c:C.b})+T(140,94,'Encoder\nq(z|x)',{fs:10.5,w:600,c:C.b});
   s+=L(188,82,216,62,{a:true})+L(188,106,216,126,{a:true})+R(218,46,52,30,'μ',{f:C.vs,c:C.v,fs:13,tw:600})+R(218,112,52,30,'σ',{f:C.vs,c:C.v,fs:13,tw:600});
