@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -38,15 +39,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        Window w = getWindow();
-        w.setStatusBarColor(Color.WHITE);
-        w.setNavigationBarColor(Color.WHITE);
-        int flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-        if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-        w.getDecorView().setSystemUiVisibility(flags);
-
         web = new WebView(this);
-        web.setBackgroundColor(Color.WHITE);
+        applyBars(isNight());
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -76,6 +70,36 @@ public class MainActivity extends Activity {
         if (state == null || web.restoreState(state) == null) {
             web.loadUrl(BASE + "index.html");
         }
+    }
+
+    static final int DARK_BG = 0xFF0D1117;
+
+    boolean isNight() {
+        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    /** Status bar, navigation bar and page background follow the page's light / dark theme. */
+    boolean pageDark;
+
+    void applyBars(boolean dark) {
+        pageDark = dark;
+        Window w = getWindow();
+        int bg = dark ? DARK_BG : Color.WHITE;
+        w.setStatusBarColor(bg);
+        w.setNavigationBarColor(bg);
+        int flags = 0;
+        if (!dark) {
+            flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        w.getDecorView().setSystemUiVisibility(flags);
+        if (web != null) web.setBackgroundColor(bg);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration c) {
+        super.onConfigurationChanged(c);
+        if (web != null) web.evaluateJavascript("window.__appNight&&window.__appNight(" + isNight() + ")", null);
     }
 
     @Override
@@ -161,6 +185,21 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public boolean isNight() {
+            return MainActivity.this.isNight();
+        }
+
+        @JavascriptInterface
+        public void setTheme(final boolean dark) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    applyBars(dark);
+                }
+            });
+        }
+
+        @JavascriptInterface
         public int sdk() {
             return Build.VERSION.SDK_INT;
         }
@@ -183,7 +222,7 @@ public class MainActivity extends Activity {
             labels.add("Save to Downloads");
             actions.add(2);
         }
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
+        new AlertDialog.Builder(this, pageDark ? android.R.style.Theme_DeviceDefault_Dialog_Alert : android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
                 .setTitle(name)
                 .setItems(labels.toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override

@@ -367,6 +367,15 @@ function haloFigs(root){root.querySelectorAll('figure.fig svg').forEach(svg=>{
   svg.querySelectorAll('text.halo,text[paint-order]').forEach(t=>{if(t.previousElementSibling&&t.previousElementSibling.classList.contains('halo-bg'))return;
     const b=t.cloneNode(true);b.setAttribute('class','halo-bg');b.setAttribute('fill','#fff');b.setAttribute('stroke','#fff');b.setAttribute('stroke-width','3.5');b.setAttribute('stroke-linejoin','round');b.removeAttribute('paint-order');b.setAttribute('aria-hidden','true');
     t.parentNode.insertBefore(b,t);t.removeAttribute('stroke');t.removeAttribute('paint-order');t.removeAttribute('stroke-width');t.classList.remove('halo')})})}
+/* dark mode: header button toggles and remembers; "auto" follows the phone / computer setting */
+const THEME={get dark(){return document.documentElement.dataset.theme==='dark'},
+  apply(d){const h=document.documentElement;h.classList.add('theming');if(d)h.dataset.theme='dark';else delete h.dataset.theme;
+    const b=$('#thm');if(b){b.setAttribute('aria-label',d?'Light mode':'Dark mode');b.title=d?'Light mode':'Dark mode'}
+    try{window.AndroidApp&&AndroidApp.setTheme&&AndroidApp.setTheme(d)}catch(e){}setTimeout(()=>h.classList.remove('theming'),300)},
+  init(){if(PRINT)return;this.apply(this.dark);const b=$('#thm');if(b)b.addEventListener('click',()=>{const d=!this.dark;store.set('theme',d?'dark':'light');this.apply(d)});
+    const sys=d=>{if(store.get('theme','auto')==='auto')this.apply(d)};window.__appNight=sys;
+    try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{if(!window.AndroidApp)sys(e.matches)})}catch(e){}}};
+THEME.init();
 if(PRINT){load(window.PRINT_SUBJ||'AIT401');document.body.classList.add('print');$('#app').innerHTML=printDoc();$('#app').querySelectorAll('button').forEach(b=>{b.outerHTML=`<span class="${b.className}">${b.innerHTML}</span>`});haloFigs(document);if(document.fonts)document.fonts.ready.then(()=>haloFigs(document))}
 else{fromHash();picker();figures();measure();bind();render(false);setupMotion();examsInit();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure();moveInd('#views','button');moveInd('#seg','button')});
