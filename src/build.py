@@ -20,6 +20,8 @@ assert not re.search(r'(?<![\w_])(PAPERS|MODS|QB)(?![\w_])', txt.replace('AIT_PA
 D = os.path.join(root, 'data')
 order = ['cst423-papers', 'cst423-m12', 'cst423-m3', 'cst423-m45', 'eet435-papers', 'eet435-m1', 'eet435-m2', 'eet435-m3', 'eet435-m4', 'eet435-m5',
          'mcn401-papers', 'mcn401-m1', 'mcn401-m2', 'mcn401-m3', 'mcn401-m4', 'mcn401-m5']
+# optional quick-revision files (data/<code>-qr.js) go after each subject's question files
+order = [x for c in ('cst423', 'eet435', 'mcn401', 'ait401') for x in [o for o in order if o.startswith(c)] + ([f'{c}-qr'] if os.path.exists(os.path.join(D, f'{c}-qr.js')) else [])]
 subj = '\n'.join(open(os.path.join(D, f + '.js'), encoding='utf8').read() for f in order)
 pdfs = {c: f'{c.lower()}-pyq-answers.pdf' for c in ('CST423', 'EET435', 'MCN401') if os.path.exists(os.path.join(root, 'out', f'{c.lower()}-pyq-answers.pdf'))}
 reg = """

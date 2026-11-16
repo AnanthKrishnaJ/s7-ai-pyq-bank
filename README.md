@@ -28,7 +28,9 @@ python src/build.py src/ait401-base.html .
 
 This writes `out/index.html` (copy it to the repo root) plus print pages used to make the PDFs with headless Edge/Chrome (`--print-to-pdf`).
 
-Answers are shown point-wise: when a subject loads, `src/app.js` (`POINTS`) turns multi-sentence paragraphs into a short lead line plus bullets, splits long bullets and `a; b; c` lists into sub-points, and draws figure labels on top of the lines with a white halo. The source answers in `data/` stay as written. Make the PDFs with the Inter, Inter Tight, Source Serif 4 and IBM Plex Mono fonts installed (copies are in `android/fonts/`) so the layout matches.
+Answers are shown point-wise: when a subject loads, `src/app.js` (`POINTS`) turns multi-sentence paragraphs into a short lead line plus bullets, splits long bullets and `a; b; c` lists into sub-points, and draws figure labels on top of the lines with a white halo. The source answers in `data/` stay as written.
+
+Quick-revision answers: `data/<code>-qr.js` holds a short exam-style answer for every question (intro, numbered points with 2–3 bullets, example, conclusion and an "Easy way to remember" line; a separate 3-mark version for Part A). The site and app show it first with the original diagrams, and keep the full answer under "Full answer"; the PDFs print the quick-revision answers with the diagrams. Done so far: CST423. Make the PDFs with the Inter, Inter Tight, Source Serif 4 and IBM Plex Mono fonts installed (copies are in `android/fonts/`) so the layout matches.
 
 ## Android app
 

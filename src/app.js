@@ -63,14 +63,14 @@ const POINTS=(()=>{
     return d.innerHTML}})();
 
 /* build occurrences once per subject */
-function prep(code){const X=SUBJ[code];if(X._occ)return X;applyFigs(X);X.QB.forEach(q=>{if(q.a)q.a=POINTS(q.a);if(q.a3)q.a3=POINTS(q.a3)});
+function prep(code){const X=SUBJ[code];if(X._occ)return X;applyFigs(X);X.QB.forEach(q=>{if(q.a)q.a=POINTS(q.a);if(q.a3)q.a3=POINTS(q.a3);if(q.qr)q.qr=QRF(q.qr);if(q.qr3)q.qr3=QRF(q.qr3)});
   const pby=Object.fromEntries(X.PAPERS.map(p=>[p.id,p])),order=X.PAPERS.map(p=>p.id),exam=pid=>!pby[pid].model,occ=[],oby={};
   /* Part A is always two per module: Q1–2 Module 1, Q3–4 Module 2, … Q9–10 Module 5 */
   X.PAPERS.forEach(P=>{P.A.forEach(([t],i)=>occ.push({key:`${P.id}:Q${i+1}`,pid:P.id,qno:i+1,sub:'',label:`Q${i+1}`,text:t,mk:3,part:'A',m:Math.ceil((i+1)/2)}));
     P.B.forEach(([m,qs])=>qs.forEach(([qno,parts])=>parts.forEach(([sub,t,mk])=>occ.push({key:`${P.id}:Q${qno}${sub}`,pid:P.id,qno,sub,label:`Q${qno}${sub?' '+sub:''}`,text:t,mk,part:'B',m}))))});
   occ.forEach(o=>oby[o.key]=o);
   const byk={};X.QB.forEach(c=>{c.s.forEach(k=>{(byk[k]=byk[k]||[]).push(c)});c.exams=[...new Set(c.s.map(k=>k.split(':')[0]).filter(exam))];c.rep=c.exams.length;
-    c.text=(c.q+' '+c.a.replace(/<[^>]+>/g,' ')+' '+(c.a3||'').replace(/<[^>]+>/g,' ')).toLowerCase()});
+    c.text=(c.q+' '+[c.a,c.a3,c.qr,c.qr3].map(x=>(x||'').replace(/<[^>]+>/g,' ')).join(' ')).toLowerCase()});
   occ.forEach(o=>{o.cards=byk[o.key]||[];o.rep=Math.max(0,...o.cards.map(c=>c.rep));
     o.others=[...new Set(o.cards.flatMap(c=>c.s))].filter(k=>k!==o.key&&oby[k]).sort((a,b)=>order.indexOf(a.split(':')[0])-order.indexOf(b.split(':')[0])||oby[a].qno-oby[b].qno);
     o.search=(o.text+' '+o.cards.map(c=>c.text).join(' ')).toLowerCase()});
@@ -91,7 +91,19 @@ const ARROW='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7
 const fmtM=v=>{const w=Math.floor(v),f=v-w;return (w||!f?String(w||''):'')+(f===.5?'½':'')||'0'};
 function split(ms,mk){if(!ms)return '';const tot=ms.reduce((a,b)=>a+b[1],0);
   return `<div class="split"><span class="sl">How to score${tot!==mk?` <i>(split for ${fmtM(tot)}; scale to ${mk})</i>`:''}</span>${ms.map(([l,v])=>`<span class="chipm">${l}<b>${fmtM(v)}</b></span>`).join('')}</div>`}
-function variant(o,c){return o.part==='A'&&c.a3?{a:c.a3,ms:c.ms3,v:'3'}:{a:c.a,ms:c.ms,v:'L'}}
+function variant(o,c){const A=o.part==='A',q=A?(c.qr3||(!c.a3&&c.qr)):c.qr;return A&&c.a3?{a:c.a3,ms:c.ms3,v:'3',q}:{a:c.a,ms:c.ms,v:'L',q}}
+/* quick-revision answer first (with the original diagrams), the full answer under "Full answer" */
+function ansHTML(V){if(!V.q)return V.a;const d=document.createElement('div');d.innerHTML=V.a;const figs=[...d.querySelectorAll('figure.fig')].map(f=>{const h=f.outerHTML;f.remove();return h}).join('');
+  let q=V.q;const i=q.indexOf('</p>');q=figs?(i>0?q.slice(0,i+4)+figs+q.slice(i+4):figs+q):q;
+  return `<div class="qr">${q}</div>`+(PRINT?'':`<details class="more"><summary>Full answer</summary><div class="morein">${d.innerHTML}</div></details>`)}
+/* quick-revision mini format: plain lines = intro, "# " numbered point, "- " bullet, "Ex: " example, "= " conclusion, "@ " memory line */
+function QRF(t){if(!t)return t;let h='',k=0,ul=false;const end=()=>{if(ul){h+='</ul>';ul=false}};
+  t.trim().split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    if(l.startsWith('# ')){end();h+=`<h5 class="qh"><span>${++k}</span>${l.slice(2)}</h5>`}
+    else if(l.startsWith('- ')||l.startsWith('Ex: ')){if(!ul){h+='<ul class="qb">';ul=true}h+=l.startsWith('Ex: ')?`<li class="ex"><i>Example:</i> ${l.slice(4)}</li>`:`<li>${l.slice(2)}</li>`}
+    else if(l.startsWith('= ')){end();h+=`<p class="qc"><b>Conclusion:</b> ${l.slice(2)}</p>`}
+    else if(l.startsWith('@ ')){end();h+=`<p class="qm"><b>Easy way to remember:</b> ${l.slice(2)}</p>`}
+    else{end();h+=`<p class="qi">${l}</p>`}});end();return h}
 let toastT;function toast(m){const t=$('#toast');if(!t)return;t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800)}
 function setHash(h){try{history.replaceState(null,'','#'+h)}catch(e){}}
 function moveInd(sel,btn){const w=$(sel);if(!w)return;const ind=w.querySelector('.ind'),a=w.querySelector(btn+'[aria-pressed="true"]');if(!ind||!a)return;ind.style.width=a.offsetWidth+'px';ind.style.transform=`translateX(${a.offsetLeft}px)`}
@@ -105,9 +117,9 @@ function rowHTML(o,shown,opt={}){
   o.cards.forEach((c,ci)=>{const V=variant(o,c),sk=c.id+V.v,first=shown?!shown.has(sk):true;if(shown&&first)shown.set(sk,o.key);
     const topic=o.cards.length>1?`<div class="topic">Part ${ci+1} of this question: ${c.q}</div>`:'';
     if(!first){const fk=shown.get(sk);ans+=`${topic}<div class="same">↑ Same question as <button type="button" class="lnk" data-jump="${fk}">${occLabel(fk)}</button>: see the answer there.${PRINT?'':` <button type="button" class="lnk" data-tg="${o.key}|${ci}">Show it here</button>`}</div>`;
-      if(!PRINT)ans+=`<div class="answ" data-a="${o.key}|${ci}"><div class="ansin"><div class="body">${split(V.ms,o.mk)}${V.a}</div></div></div>`;return}
+      if(!PRINT)ans+=`<div class="answ" data-a="${o.key}|${ci}"><div class="ansin"><div class="body">${split(V.ms,o.mk)}${ansHTML(V)}</div></div></div>`;return}
     const id=o.key+'|'+ci,open=PRINT||(S.quiz?S.tog.has(id):!S.tog.has(id));
-    ans+=topic+(PRINT?'':`<button type="button" class="reveal" data-tg="${id}" aria-expanded="${open}">${CHEV}<span>${open?'Hide answer':'Show answer'}</span></button>`)+`<div class="answ${open?' open':''}" data-a="${id}"><div class="ansin"><div class="body">${split(V.ms,o.mk)}${V.a}</div></div></div>`});
+    ans+=topic+(PRINT?'':`<button type="button" class="reveal" data-tg="${id}" aria-expanded="${open}">${CHEV}<span>${open?'Hide answer':'Show answer'}</span></button>`)+`<div class="answ${open?' open':''}" data-a="${id}"><div class="ansin"><div class="body">${split(V.ms,o.mk)}${ansHTML(V)}</div></div></div>`});
   if(!o.cards.length)ans='<div class="same">No answer available.</div>';
   return `<article class="row" id="o-${o.key.replace(':','-')}" style="--mc:var(--m${o.m})">
     <div class="rtop"><span class="qn">${o.label}</span><div class="qt">${o.text}</div><span class="mkb${o.part==='B'?' long':''}">${o.mk}</span></div>
@@ -141,7 +153,7 @@ function paperHTML(P,withAns){let h=`<div class="sheet"><div class="reg"><span>R
   <div class="ph">PART A</div><p class="pi">Answer all questions, each carries 3 marks.</p>`;
   const prow=(o,first)=>{const tid='p|'+o.key,op=S.ptog.has(tid);let t=`<div class="prow" id="p-${o.key.replace(':','-')}"><span class="no">${first?o.qno+'.':''}</span><span class="sub">${o.sub?o.sub+')':''}</span><span class="txt">${o.text}</span><span class="pm">(${o.mk})</span>`;
     if(withAns){t+=`<span class="tools"><span class="tm">Module ${o.m}</span>${o.rep>=2?`<span class="rep">Asked ${o.rep}×</span>`:''}<button type="button" class="pbtn" data-pt="${tid}" aria-expanded="${op}">${CHEV}${op?'Hide answer':'Answer'}</button><button type="button" class="lnk" data-open-mod="${o.key}">Module view →</button></span>`;
-      t+=`<div class="answ${op?' open':''}" data-pa="${tid}"><div class="ansin"><div class="body">${o.cards.map((c,ci)=>{const V=variant(o,c);return (o.cards.length>1?`<div class="topic">Part ${ci+1}: ${c.q}</div>`:'')+split(V.ms,o.mk)+V.a}).join('')}</div></div></div>`}
+      t+=`<div class="answ${op?' open':''}" data-pa="${tid}"><div class="ansin"><div class="body">${o.cards.map((c,ci)=>{const V=variant(o,c);return (o.cards.length>1?`<div class="topic">Part ${ci+1}: ${c.q}</div>`:'')+split(V.ms,o.mk)+ansHTML(V)}).join('')}</div></div></div>`}
     return t+'</div>'};
   OCC.filter(o=>o.pid===P.id&&o.part==='A').forEach(o=>h+=prow(o,true));
   h+=`<div class="ph">PART B</div><p class="pi">Answer any one full question from each module, each carries 14 marks.</p>`;
