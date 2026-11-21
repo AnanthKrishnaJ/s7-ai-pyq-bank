@@ -39,7 +39,9 @@ def page(pre=''):
     # pre (print flags) goes first so the shell's theme script sees PRINT_MODE and keeps print pages light
     return pre + '\n'.join(head) + '\n' + shell + '\n' + '<script>\nvar SUBJ={};\n' + txt + '\n' + subj + '\n' + reg + '\n' + app + '\n</script>\n'
 out = os.path.join(root, 'out'); os.makedirs(out, exist_ok=True)
-open(os.path.join(out, 'pyq-bank.html'), 'w', encoding='utf8').write(page())
+# claude.ai artifact copy: the APK is not hosted there, so its button opens the Vercel copy instead
+open(os.path.join(out, 'pyq-bank.html'), 'w', encoding='utf8').write(page().replace(
+    'href="app/PYQ-Bank.apk" download="PYQ-Bank.apk"', 'href="https://s7-ai-pyq-bank.vercel.app/app/PYQ-Bank.apk" target="_blank" rel="noopener"'))
 skel = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font:14px sans-serif}</style></head><body>'
 for c in ('AIT401', 'CST423', 'EET435', 'MCN401'):
     open(os.path.join(out, f'print-{c}.html'), 'w', encoding='utf8').write(skel + page(f"<script>window.PRINT_MODE=1;window.PRINT_SUBJ='{c}'</script>\n") + '</body></html>')
