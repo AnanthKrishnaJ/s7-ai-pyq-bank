@@ -20,8 +20,9 @@ assert not re.search(r'(?<![\w_])(PAPERS|MODS|QB)(?![\w_])', txt.replace('AIT_PA
 D = os.path.join(root, 'data')
 order = ['cst423-papers', 'cst423-m12', 'cst423-m3', 'cst423-m45', 'eet435-papers', 'eet435-m1', 'eet435-m2', 'eet435-m3', 'eet435-m4', 'eet435-m5',
          'mcn401-papers', 'mcn401-m1', 'mcn401-m2', 'mcn401-m3', 'mcn401-m4', 'mcn401-m5']
-# optional quick-revision files (data/<code>-qr.js) go after each subject's question files
-order = [x for c in ('cst423', 'eet435', 'mcn401', 'ait401') for x in [o for o in order if o.startswith(c)] + ([f'{c}-qr'] if os.path.exists(os.path.join(D, f'{c}-qr.js')) else [])]
+# optional quick-revision files (data/<code>-qr.js, or split as data/<code>-qr-m1.js …) go after each subject's question files
+import glob
+order = [x for c in ('cst423', 'eet435', 'mcn401', 'ait401') for x in [o for o in order if o.startswith(c)] + sorted(os.path.basename(p)[:-3] for p in glob.glob(os.path.join(D, f'{c}-qr*.js')))]
 subj = '\n'.join(open(os.path.join(D, f + '.js'), encoding='utf8').read() for f in order)
 pdfs = {c: f'{c.lower()}-pyq-answers.pdf' for c in ('CST423', 'EET435', 'MCN401') if os.path.exists(os.path.join(root, 'out', f'{c.lower()}-pyq-answers.pdf'))}
 reg = """
@@ -35,7 +36,8 @@ SUBJ.AIT401={code:'AIT401',name:'Foundations of Deep Learning',short:'Deep learn
 shell = open(os.path.join(root, 'src', 'shell.html'), encoding='utf8').read()
 app = '\n'.join(open(os.path.join(root, 'src', f), encoding='utf8').read() for f in ('fig2.js', 'figmap.js', 'app.js'))
 def page(pre=''):
-    return '\n'.join(head) + '\n' + shell + '\n' + pre + '<script>\nvar SUBJ={};\n' + txt + '\n' + subj + '\n' + reg + '\n' + app + '\n</script>\n'
+    # pre (print flags) goes first so the shell's theme script sees PRINT_MODE and keeps print pages light
+    return pre + '\n'.join(head) + '\n' + shell + '\n' + '<script>\nvar SUBJ={};\n' + txt + '\n' + subj + '\n' + reg + '\n' + app + '\n</script>\n'
 out = os.path.join(root, 'out'); os.makedirs(out, exist_ok=True)
 open(os.path.join(out, 'pyq-bank.html'), 'w', encoding='utf8').write(page())
 skel = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font:14px sans-serif}</style></head><body>'
