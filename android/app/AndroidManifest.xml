@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="5" android:versionName="1.4" android:compileSdkVersion="34" android:compileSdkVersionCodename="14" package="com.ananth.pyqbank" platformBuildVersionCode="34" platformBuildVersionName="14">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="6" android:versionName="1.5" android:compileSdkVersion="34" android:compileSdkVersionCodename="14" package="com.ananth.pyqbank" platformBuildVersionCode="34" platformBuildVersionName="14">
   <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34" />
+  <uses-permission android:name="android.permission.INTERNET" />
   <application android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:theme="@style/AppTheme" android:allowBackup="true" android:hardwareAccelerated="true" android:supportsRtl="true" android:largeHeap="true">
     <activity android:name="com.ananth.pyqbank.MainActivity" android:exported="true" android:launchMode="singleTask" android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density|fontScale|layoutDirection|locale">
       <intent-filter>

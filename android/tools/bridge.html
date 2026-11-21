@@ -13,5 +13,15 @@
   if(!st.length)return false;var h=st.pop();lock=true;cur=h;rs(null,'',h);
   try{dispatchEvent(new HashChangeEvent('hashchange'))}finally{lock=false}return true};
  window.__appToast=function(m){if(typeof toast==='function')toast(m)};
+ /* live update: the app downloaded newer site content in the background (Updater.java) */
+ window.__appUpdated=function(){
+  if(document.getElementById('appUpd'))return;
+  var b=document.createElement('div');b.id='appUpd';b.setAttribute('role','status');
+  b.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:200;display:flex;gap:12px;align-items:center;justify-content:space-between;background:#0f1115;color:#fff;border-radius:12px;padding:10px 10px 10px 14px;font:500 13.5px Inter,system-ui,sans-serif;box-shadow:0 12px 30px -12px rgba(0,0,0,.55)';
+  var t=document.createElement('span');t.textContent='New answers and PDFs downloaded.';b.appendChild(t);
+  var r=document.createElement('button');r.type='button';r.textContent='Reload';
+  r.style.cssText='flex:none;border:0;border-radius:999px;background:#fff;color:#0f1115;font:600 13px Inter,system-ui,sans-serif;padding:8px 16px';
+  r.onclick=function(){try{AndroidApp.reload(location.hash||'')}catch(e){location.reload()}};
+  b.appendChild(r);document.body.appendChild(b)};
 })();
 </script>

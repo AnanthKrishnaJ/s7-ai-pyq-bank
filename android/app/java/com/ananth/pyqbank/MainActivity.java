@@ -67,9 +67,30 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(web);
+        Updater.checkApk(this);
         if (state == null || web.restoreState(state) == null) {
-            web.loadUrl(BASE + "index.html");
+            web.loadUrl(home() + "index.html");
         }
+    }
+
+    /** Downloaded site content (files/live) when there is some, else the copy in the APK. */
+    String home() {
+        return Updater.hasLive(this) ? Updater.liveBase(this) : BASE;
+    }
+
+    /** Background check for newer site content; the page shows a Reload banner when it is ready. */
+    void checkForUpdate(boolean force) {
+        Updater.checkAsync(getApplicationContext(), force, new Updater.Listener() {
+            @Override
+            public void updated() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (web != null) web.evaluateJavascript("window.__appUpdated&&window.__appUpdated()", null);
+                    }
+                });
+            }
+        });
     }
 
     static final int DARK_BG = 0xFF0D1117;
@@ -118,6 +139,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         web.onResume();
+        checkForUpdate(false);
     }
 
     @Override
@@ -150,8 +172,10 @@ public class MainActivity extends Activity {
     /** Links: bundled PDFs open natively, web links go to the browser, everything else stays in the app. */
     boolean handleUrl(String url) {
         if (url == null) return false;
-        if (url.startsWith(BASE)) {
-            String rest = url.substring(BASE.length());
+        String live = Updater.liveBase(this);
+        String root = url.startsWith(BASE) ? BASE : url.startsWith(live) ? live : null;
+        if (root != null) {
+            String rest = url.substring(root.length());
             int cut = rest.indexOf('#');
             if (cut >= 0) rest = rest.substring(0, cut);
             cut = rest.indexOf('?');
@@ -199,6 +223,19 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Reload button on the update banner: open the downloaded page at the same view. */
+        @JavascriptInterface
+        public void reload(final String hash) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (web == null) return;
+                    String h = hash != null && hash.startsWith("#") && hash.length() < 300 ? hash : "";
+                    web.loadUrl(home() + "index.html" + h);
+                }
+            });
+        }
+
         @JavascriptInterface
         public int sdk() {
             return Build.VERSION.SDK_INT;
@@ -238,12 +275,7 @@ public class MainActivity extends Activity {
     }
 
     boolean assetExists(String asset) {
-        try {
-            getAssets().open(WWW + asset).close();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return Updater.exists(this, asset);
     }
 
     void openPdf(String asset, String name) {
@@ -290,7 +322,7 @@ public class MainActivity extends Activity {
                     v.put(MediaStore.MediaColumns.IS_PENDING, 1);
                     Uri dest = cr.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
                     if (dest == null) throw new IllegalStateException("insert failed");
-                    InputStream in = getAssets().open(WWW + asset);
+                    InputStream in = Updater.open(MainActivity.this, asset);
                     OutputStream out = cr.openOutputStream(dest);
                     try {
                         byte[] buf = new byte[65536];

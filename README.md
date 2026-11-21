@@ -38,7 +38,22 @@ Quick-revision answers: `data/<code>-qr.js` holds a short exam-style answer for 
 
 Install: download the APK on the phone, open it, and allow "Install unknown apps" when asked.
 
-Rebuild after changing the site (no Gradle or Android SDK needed):
+### Live updates (no reinstall)
+
+The app updates itself from the site. On every launch (at most every 30 minutes) it fetches `app/update.json`, downloads only the files whose SHA-1 changed (`app/www/index.html`, fonts, PDFs from `pdf/`), checks them, and swaps them in; a "Reload" banner then shows the new answers. It works offline with whatever it last had. Code: `android/app/java/com/ananth/pyqbank/Updater.java`.
+
+After every site change (new answers, PDFs), refresh the update bundle before pushing:
+
+```bash
+python -m pip install --user fonttools
+python android/tools/make_web.py . --site
+```
+
+This writes `app/www/` and `app/update.json`. Vercel deploys them with the site, and installed apps pick them up. A new APK is only needed for changes to the Java code or the manifest.
+
+### Rebuild the APK
+
+No Gradle or Android SDK needed:
 
 ```bash
 KEYSTORE=path/to/pyqbank-release.p12 KEYPASS=... android/build.sh

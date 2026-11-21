@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Serves the PDFs bundled in assets/www to other apps (PDF viewers, share targets).
+ * Serves the PDFs (files/live from Updater, else bundled in assets/www) to other apps (PDF viewers, share targets).
  * URI shape: content://<package>.pdf/<asset-name>/<display-name>
  * Each PDF is copied once into the app cache so viewers get a real, seekable file.
  */
@@ -66,6 +66,9 @@ public class PdfProvider extends ContentProvider {
     }
 
     private synchronized File ensure(String asset) throws FileNotFoundException {
+        // a newer copy downloaded by Updater is already a real file
+        File liveCopy = new File(Updater.live(getContext()), asset);
+        if (Updater.hasLive(getContext()) && liveCopy.isFile()) return liveCopy;
         File dir = new File(getContext().getCacheDir(), "pdf");
         if (!dir.isDirectory() && !dir.mkdirs()) throw new FileNotFoundException("cache");
         File f = new File(dir, asset);
