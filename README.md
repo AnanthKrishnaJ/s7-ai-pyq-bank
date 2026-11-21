@@ -42,14 +42,14 @@ Install: download the APK on the phone, open it, and allow "Install unknown apps
 
 The app updates itself from the site. On every launch (at most every 30 minutes) it fetches `app/update.json`, downloads only the files whose SHA-1 changed (`app/www/index.html`, fonts, PDFs from `pdf/`), checks them, and swaps them in; a "Reload" banner then shows the new answers. It works offline with whatever it last had. Code: `android/app/java/com/ananth/pyqbank/Updater.java`.
 
-After every site change (new answers, PDFs), refresh the update bundle before pushing:
+The update bundle (`app/www/` and `app/update.json`) is rebuilt automatically on every Vercel deploy: the project's build command is `sh android/tools/vercel-build.sh`, which runs `android/tools/make_web.py . --site` on the `index.html` and `pdf/` being deployed. So any change pushed to the site reaches installed apps on their next launch. To refresh the committed copy locally as well:
 
 ```bash
-python -m pip install --user fonttools
+python -m pip install --user fonttools==4.67.0
 python android/tools/make_web.py . --site
 ```
 
-This writes `app/www/` and `app/update.json`. Vercel deploys them with the site, and installed apps pick them up. A new APK is only needed for changes to the Java code or the manifest.
+Installed apps pick the new files up from the live site. A new APK is only needed for changes to the Java code or the manifest.
 
 ### Rebuild the APK
 

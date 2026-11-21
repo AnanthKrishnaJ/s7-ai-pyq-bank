@@ -15,7 +15,9 @@ import hashlib, html, json, os, shutil, subprocess, sys
 
 root = sys.argv[1]
 site = len(sys.argv) > 2 and sys.argv[2] == '--site'
-out = os.path.join(root, 'app', 'www') if site else sys.argv[2]
+final = os.path.join(root, 'app', 'www') if site else sys.argv[2]
+# site mode builds next to app/www and swaps at the end, so a failed run never leaves a half-written bundle
+out = final + '.tmp' if site else final
 here = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(here, '..', 'fonts')   # OFL fonts, subset to the characters the page uses
 # (family, weight or weight range, source file)
@@ -26,6 +28,7 @@ FACES = [('Inter', '100 900', 'Inter-VF.ttf'), ('Inter Tight', '100 900', 'Inter
 s = open(os.path.join(root, 'index.html'), encoding='utf8').read()
 if site and os.path.isdir(out):
     shutil.rmtree(out)
+old_fonts = os.path.join(final, 'fonts')
 os.makedirs(os.path.join(out, 'fonts'), exist_ok=True)
 
 # 1. fonts: subset the bundled OFL fonts to the characters the page uses
@@ -38,9 +41,16 @@ css = ''
 fonts = []
 for fam, w, src in FACES:
     name = os.path.splitext(src)[0] + '.woff'
-    subprocess.check_call([sys.executable, '-m', 'fontTools.subset', os.path.join(FONTS, src), f'--text-file={txt}',
-                           '--layout-features=kern,liga,calt,tnum,case,ss01,ss02,zero', '--flavor=woff',
-                           f'--output-file={out}/fonts/{name}'])
+    try:
+        subprocess.check_call([sys.executable, '-m', 'fontTools.subset', os.path.join(FONTS, src), f'--text-file={txt}',
+                               '--layout-features=kern,liga,calt,tnum,case,ss01,ss02,zero', '--flavor=woff',
+                               f'--output-file={out}/fonts/{name}'])
+    except (subprocess.CalledProcessError, OSError):
+        # no fontTools (e.g. a bare build machine): reuse the previous subset; new characters fall back to system fonts
+        if not os.path.isfile(os.path.join(old_fonts, name)):
+            raise
+        shutil.copy2(os.path.join(old_fonts, name), os.path.join(out, 'fonts', name))
+        print('fontTools unavailable, reused', name)
     fonts.append(name)
     css += (f"@font-face{{font-family:'{fam}';font-style:normal;font-weight:{w};font-display:swap;"
             f"src:url(fonts/{name}) format('woff')}}")
@@ -80,6 +90,11 @@ files += [(f, os.path.join(root, 'pdf', f), f'pdf/{f}') for f in pdfs]
 entries = [{'p': p, 'h': sha1(src), 's': os.path.getsize(src), 'u': u} for p, src, u in files]
 version = hashlib.sha1('\n'.join(f"{e['p']}:{e['h']}" for e in entries).encode()).hexdigest()[:16]
 manifest = json.dumps({'v': version, 'files': entries}, indent=1)
+if site:
+    if os.path.isdir(final):
+        shutil.rmtree(final)
+    os.rename(out, final)
+    out = final
 mpath = os.path.join(root, 'app', 'update.json') if site else os.path.join(out, 'update.json')
 open(mpath, 'w', newline='\n', encoding='utf8').write(manifest + '\n')
 print(f'{"site update bundle" if site else "web bundle"}: index.html + {len(fonts)} fonts + {len(pdfs)} PDFs, version {version} -> {mpath}')

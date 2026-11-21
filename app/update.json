@@ -1,5 +1,5 @@
 {
- "v": "62eb74b89ecd85f3",
+ "v": "581e38a86ddc6bd7",
  "files": [
   {
    "p": "index.html",
@@ -9,38 +9,38 @@
   },
   {
    "p": "fonts/Inter-VF.woff",
-   "h": "803c8be254dfd3765a90fd55f1c7b5df0001b971",
-   "s": 135572,
+   "h": "6297d410c15cd83d22beb38fc5470cd4edcf74ca",
+   "s": 137476,
    "u": "app/www/fonts/Inter-VF.woff"
   },
   {
    "p": "fonts/InterTight-VF.woff",
-   "h": "840ab3e944cdc8879503a4e82148f8a2ff63359f",
-   "s": 85768,
+   "h": "71057302d14b70284645877dde9b6130c1b7fd76",
+   "s": 86292,
    "u": "app/www/fonts/InterTight-VF.woff"
   },
   {
    "p": "fonts/SourceSerif4-VF.woff",
-   "h": "2c89406f7043cf9fb755317bb4d2311c46f5903d",
-   "s": 223128,
+   "h": "0eac4d382729d9cfec5ba4bcc98a0070a9788d4a",
+   "s": 224436,
    "u": "app/www/fonts/SourceSerif4-VF.woff"
   },
   {
    "p": "fonts/IBMPlexMono-Regular.woff",
-   "h": "86743a3c82c6dcbbec8f638c51c9f6b8c0a1be89",
-   "s": 26988,
+   "h": "2822cacc98ba78cf8c186d92038ae0e1905747c9",
+   "s": 27172,
    "u": "app/www/fonts/IBMPlexMono-Regular.woff"
   },
   {
    "p": "fonts/IBMPlexMono-Medium.woff",
-   "h": "09ac1767b4c626e1753ce4cfe8d6506fe47ee81e",
-   "s": 27448,
+   "h": "6bceb55a879492952ca3b3f028005652b4d7390a",
+   "s": 27600,
    "u": "app/www/fonts/IBMPlexMono-Medium.woff"
   },
   {
    "p": "fonts/IBMPlexMono-SemiBold.woff",
-   "h": "c0ecea6b92491b64ac9d463668565a74fe6e5b07",
-   "s": 28544,
+   "h": "ebd8616c604f6faa34179c63ca00a20324cea294",
+   "s": 28820,
    "u": "app/www/fonts/IBMPlexMono-SemiBold.woff"
   },
   {
