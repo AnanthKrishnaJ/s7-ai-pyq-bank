@@ -581,7 +581,9 @@ details.more>summary::-webkit-details-marker{display:none}details.more>summary::
 details.more[open]>summary::before{content:"−"}details.more .morein{padding:0 12px 10px;font-size:.96em}
 body.print .qr h5.qh{font-size:11.5px;margin:.55em 0 .1em}body.print .qr h5.qh span{width:16px;height:16px;font-size:9px;border-radius:4px}
 body.print .qr ul.qb{padding-left:38px;margin:.05em 0 .2em}body.print .qr ul.qb li{margin:.06em 0;line-height:1.4}body.print .qr .qi+ul.qb{padding-left:16px}
-body.print .qr .qi{margin:.1em 0 .35em}body.print .qr .qc{margin:.5em 0 .2em;padding-top:.35em}body.print .qr .qm{padding:5px 8px;margin:.35em 0 0}
+body.print .qr .qi{margin:.1em 0 .35em}body.print .qr .qc{margin:.5em 0 .2em;padding-top:.35em}
+/* Chrome prints dashed borders as thousands of tiny rectangles (repeated on every page), which bloats the PDFs: use solid hairlines in print */
+body.print .qr .qc{border-top-style:solid}body.print .ybh,body.print .split{border-bottom-style:solid}body.print .qr .qm{padding:5px 8px;margin:.35em 0 0}
 /* point-wise answers */
 .body .lead{color:var(--ink);font-weight:500;margin:.25em 0 .5em}
 .body p.lbl{margin:.75em 0 .15em}.body p.lbl+ul{margin-top:.15em}
